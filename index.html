@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#0f172a">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Alokasi Dana - Budget Tracker</title>
+    <title>Alokasi Dana & Tangga Finansial</title>
     <style>
         :root {
             --bg-app: #f8fafc;
@@ -57,7 +57,7 @@
         /* Header */
         header {
             background-color: var(--bg-card);
-            padding: 18px 20px 14px;
+            padding: 16px 20px 14px;
             border-bottom: 1px solid var(--border-color);
             position: sticky;
             top: 0;
@@ -68,20 +68,15 @@
         }
 
         .header-title h1 {
-            font-size: 18px;
+            font-size: 17px;
             font-weight: 700;
             letter-spacing: -0.02em;
         }
 
         .header-title p {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-muted);
             margin-top: 2px;
-        }
-
-        .header-actions {
-            display: flex;
-            gap: 8px;
         }
 
         .btn-icon {
@@ -93,10 +88,6 @@
             font-size: 12px;
             font-weight: 600;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            transition: background 0.15s;
         }
 
         .btn-icon:active {
@@ -122,38 +113,80 @@
             display: flex;
         }
 
-        /* Total Card */
+        /* Summary & Status Card */
         .summary-card {
             background: var(--primary);
             color: #ffffff;
             border-radius: var(--radius-lg);
-            padding: 20px;
+            padding: 18px;
+        }
+
+        .summary-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
         }
 
         .summary-label {
-            font-size: 12px;
+            font-size: 11px;
             text-transform: uppercase;
             letter-spacing: 0.05em;
             color: #94a3b8;
             font-weight: 600;
         }
 
+        .level-pill {
+            background: rgba(255,255,255,0.14);
+            color: #38bdf8;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 9px;
+            border-radius: 999px;
+        }
+
         .summary-amount {
-            font-size: 28px;
+            font-size: 26px;
             font-weight: 700;
             margin-top: 6px;
             letter-spacing: -0.02em;
             font-variant-numeric: tabular-nums;
         }
 
+        .progress-wrapper {
+            margin-top: 14px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: #cbd5e1;
+            margin-bottom: 6px;
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 7px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #10b981;
+            border-radius: 999px;
+            transition: width 0.3s ease;
+        }
+
         .summary-meta {
             margin-top: 12px;
-            padding-top: 12px;
+            padding-top: 10px;
             border-top: 1px solid rgba(255,255,255,0.12);
             display: flex;
             justify-content: space-between;
-            font-size: 12px;
-            color: #cbd5e1;
+            font-size: 11px;
+            color: #94a3b8;
         }
 
         /* Bucket Grid */
@@ -180,7 +213,7 @@
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-md);
-            padding: 14px;
+            padding: 13px;
             box-shadow: var(--shadow-sm);
             display: flex;
             flex-direction: column;
@@ -191,7 +224,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .bucket-name {
@@ -201,9 +234,9 @@
         }
 
         .bucket-badge {
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 700;
-            padding: 2px 7px;
+            padding: 2px 6px;
             border-radius: 6px;
         }
 
@@ -219,13 +252,52 @@
             font-variant-numeric: tabular-nums;
         }
 
-        /* Form Card */
+        .bucket-sub {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 4px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Form Card & Mode Switcher */
         .card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-lg);
             padding: 16px;
             box-shadow: var(--shadow-sm);
+        }
+
+        .mode-switch {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            background: var(--bg-app);
+            padding: 4px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 14px;
+        }
+
+        .mode-btn {
+            border: none;
+            background: transparent;
+            padding: 8px;
+            border-radius: 7px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .mode-btn.active-in {
+            background: var(--accent-investasi);
+            color: #ffffff;
+        }
+
+        .mode-btn.active-out {
+            background: var(--danger);
+            color: #ffffff;
         }
 
         .form-group {
@@ -245,11 +317,10 @@
             padding: 11px 12px;
             border: 1px solid var(--border-color);
             border-radius: 10px;
-            font-size: 15px;
+            font-size: 14px;
             color: var(--text-main);
             background: var(--bg-app);
             outline: none;
-            transition: border-color 0.15s;
         }
 
         .form-control:focus {
@@ -275,13 +346,8 @@
             font-variant-numeric: tabular-nums;
         }
 
-        .preview-row span:first-child {
-            color: var(--text-muted);
-        }
-
-        .preview-row span:last-child {
-            font-weight: 600;
-        }
+        .preview-row span:first-child { color: var(--text-muted); }
+        .preview-row span:last-child { font-weight: 600; }
 
         .btn-primary {
             width: 100%;
@@ -293,14 +359,164 @@
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
+        }
+
+        .btn-danger-submit {
+            background: var(--danger);
+        }
+
+        /* Tangga & Level Finansial */
+        .level-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 14px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .level-card.current-level {
+            border: 2px solid var(--accent-investasi);
+            background: #f0fdf4;
+        }
+
+        .level-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .level-title {
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .level-pct {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--accent-investasi);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .level-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.45;
+            margin-bottom: 8px;
+        }
+
+        .level-bar {
+            width: 100%;
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .level-bar-fill {
+            height: 100%;
+            background: var(--accent-investasi);
+            border-radius: 999px;
+        }
+
+        /* 7 Tangga Checklist */
+        .step-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 13px;
+            margin-bottom: 8px;
+            cursor: pointer;
             transition: background 0.15s;
         }
 
-        .btn-primary:active {
-            background: var(--primary-hover);
+        .step-item.completed {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+        }
+
+        .step-checkbox {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--accent-investasi);
+            margin-top: 2px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3px;
+        }
+
+        .step-num {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--accent-pokok);
+            text-transform: uppercase;
+        }
+
+        .step-auto-tag {
+            font-size: 10px;
+            background: #dbeafe;
+            color: var(--accent-pokok);
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .step-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .step-item.completed .step-title {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        .step-desc {
+            font-size: 11.5px;
+            color: var(--text-muted);
+            margin-top: 3px;
+            line-height: 1.4;
         }
 
         /* History List */
+        .filter-pills {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+
+        .pill-btn {
+            padding: 6px 12px;
+            border-radius: 999px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-card);
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+
+        .pill-btn.active {
+            background: var(--primary);
+            color: #ffffff;
+            border-color: var(--primary);
+        }
+
         .history-list {
             display: flex;
             flex-direction: column;
@@ -311,7 +527,7 @@
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-md);
-            padding: 14px;
+            padding: 13px;
             box-shadow: var(--shadow-sm);
         }
 
@@ -319,7 +535,6 @@
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 10px;
         }
 
         .history-title {
@@ -327,23 +542,32 @@
             font-weight: 700;
         }
 
-        .history-date {
+        .history-meta {
             font-size: 11px;
             color: var(--text-muted);
-            margin-top: 2px;
+            margin-top: 3px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .history-right {
-            text-align: right;
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
-        .history-total {
+        .amount-in {
             font-size: 14px;
             font-weight: 700;
             color: var(--accent-investasi);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .amount-out {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--danger);
             font-variant-numeric: tabular-nums;
         }
 
@@ -357,16 +581,14 @@
             font-size: 13px;
             font-weight: 700;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
 
         .history-breakdown {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 6px;
-            padding-top: 10px;
+            gap: 5px;
+            margin-top: 10px;
+            padding-top: 9px;
             border-top: 1px solid var(--border-color);
             font-size: 11px;
             font-variant-numeric: tabular-nums;
@@ -378,14 +600,11 @@
             color: var(--text-muted);
         }
 
-        .hb-item strong {
-            color: var(--text-main);
-            font-weight: 600;
-        }
+        .hb-item strong { color: var(--text-main); }
 
         .empty-state {
             text-align: center;
-            padding: 36px 20px;
+            padding: 32px 20px;
             color: var(--text-muted);
             font-size: 13px;
             background: var(--bg-card);
@@ -444,7 +663,7 @@
             font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
         }
 
-        /* Bottom Navigation */
+        /* Bottom Navigation (4 Tabs) */
         nav.bottom-nav {
             position: fixed;
             bottom: 0;
@@ -453,7 +672,7 @@
             background: var(--bg-card);
             border-top: 1px solid var(--border-color);
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
             z-index: 30;
         }
@@ -464,8 +683,8 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
-            font-size: 11px;
+            gap: 3px;
+            font-size: 10.5px;
             font-weight: 600;
             color: var(--text-muted);
             cursor: pointer;
@@ -477,19 +696,19 @@
         }
 
         .nav-icon {
-            font-size: 18px;
+            font-size: 17px;
             line-height: 1;
         }
 
         /* Toast */
         .toast {
             position: fixed;
-            top: 72px;
+            top: 68px;
             left: 50%;
             transform: translateX(-50%) translateY(-10px);
             background: #0f172a;
             color: #ffffff;
-            padding: 10px 16px;
+            padding: 9px 16px;
             border-radius: 999px;
             font-size: 12px;
             font-weight: 600;
@@ -511,33 +730,47 @@
 <div class="app-shell">
     <header>
         <div class="header-title">
-            <h1>Alokasi Dana</h1>
+            <h1>Alokasi & Tangga Kekayaan</h1>
             <p>50% Pokok • 30% Invest • 15% Darurat • 5% Bebas</p>
         </div>
-        <div class="header-actions">
-            <button class="btn-icon" onclick="exportJSON()" title="Download db.json">
-                ↓ JSON
-            </button>
-        </div>
+        <button class="btn-icon" onclick="exportJSON()" title="Download db.json">
+            ↓ db.json
+        </button>
     </header>
 
     <div id="toast" class="toast">Tersimpan</div>
 
     <main>
-        <!-- TAB 1: BERANDA & INPUT -->
+        <!-- TAB 1: BERANDA (SALDO & TRANSAKSI) -->
         <section id="tab-home" class="tab-panel active">
             <div class="summary-card">
-                <div class="summary-label">Total Akumulasi Pendapatan</div>
-                <div class="summary-amount" id="total-pendapatan">Rp 0</div>
+                <div class="summary-top">
+                    <div>
+                        <div class="summary-label">Total Saldo Bersih Saat Ini</div>
+                        <div class="summary-amount" id="total-saldo">Rp 0</div>
+                    </div>
+                    <span class="level-pill" id="badge-current-level">Level 1: Survival</span>
+                </div>
+
+                <div class="progress-wrapper">
+                    <div class="progress-header">
+                        <span id="summary-step-label">7 Tangga Kekayaan: 0/7 (0%)</span>
+                        <span id="summary-next-target">Target Lv 2: 12x Pengeluaran</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-fill" id="summary-step-bar" style="width: 0%;"></div>
+                    </div>
+                </div>
+
                 <div class="summary-meta">
-                    <span id="total-transaksi">0 Transaksi tercatat</span>
-                    <span>DB: db.json</span>
+                    <span id="meta-pemasukan">Masuk: Rp 0</span>
+                    <span id="meta-pengeluaran">Keluar: Rp 0</span>
                 </div>
             </div>
 
             <div>
                 <div class="section-header">
-                    <span class="section-title">Saldo Tiap Pos</span>
+                    <span class="section-title">Sisa Saldo Tiap Pos</span>
                 </div>
                 <div class="bucket-grid">
                     <div class="bucket-card">
@@ -545,87 +778,140 @@
                             <span class="bucket-name">Kebutuhan Pokok</span>
                             <span class="bucket-badge badge-pokok">50%</span>
                         </div>
-                        <div class="bucket-value" id="sum-pokok">Rp 0</div>
+                        <div class="bucket-value" id="bal-pokok">Rp 0</div>
+                        <div class="bucket-sub" id="sub-pokok">Terpakai: Rp 0</div>
                     </div>
                     <div class="bucket-card">
                         <div class="bucket-top">
                             <span class="bucket-name">Butir Investasi</span>
                             <span class="bucket-badge badge-investasi">30%</span>
                         </div>
-                        <div class="bucket-value" id="sum-investasi">Rp 0</div>
+                        <div class="bucket-value" id="bal-investasi">Rp 0</div>
+                        <div class="bucket-sub" id="sub-investasi">Terpakai: Rp 0</div>
                     </div>
                     <div class="bucket-card">
                         <div class="bucket-top">
                             <span class="bucket-name">Dana Darurat</span>
                             <span class="bucket-badge badge-darurat">15%</span>
                         </div>
-                        <div class="bucket-value" id="sum-darurat">Rp 0</div>
+                        <div class="bucket-value" id="bal-darurat">Rp 0</div>
+                        <div class="bucket-sub" id="sub-darurat">Terpakai: Rp 0</div>
                     </div>
                     <div class="bucket-card">
                         <div class="bucket-top">
                             <span class="bucket-name">Uang Bebas</span>
                             <span class="bucket-badge badge-bebas">5%</span>
                         </div>
-                        <div class="bucket-value" id="sum-bebas">Rp 0</div>
+                        <div class="bucket-value" id="bal-bebas">Rp 0</div>
+                        <div class="bucket-sub" id="sub-bebas">Terpakai: Rp 0</div>
                     </div>
                 </div>
             </div>
 
+            <!-- Form Pemasukan / Pengeluaran -->
             <div class="card">
-                <div class="section-header">
-                    <span class="section-title">Catat Pendapatan Baru</span>
+                <div class="mode-switch">
+                    <button type="button" id="btn-mode-in" class="mode-btn active-in" onclick="setTxMode('pemasukan')">+ Pemasukan</button>
+                    <button type="button" id="btn-mode-out" class="mode-btn" onclick="setTxMode('pengeluaran')">- Pengeluaran</button>
                 </div>
-                <form id="income-form" onsubmit="handleAddIncome(event)">
+
+                <form id="tx-form" onsubmit="handleTxSubmit(event)">
                     <div class="form-group">
-                        <label for="input-nama">Nama / Sumber Pendapatan</label>
-                        <input type="text" id="input-nama" class="form-control" placeholder="Contoh: Gaji Bulanan, Proyek Web" required>
+                        <label for="input-nama" id="label-nama">Sumber Pemasukan</label>
+                        <input type="text" id="input-nama" class="form-control" placeholder="Contoh: Gaji Bulanan, Freelance" required>
                     </div>
+
+                    <div class="form-group" id="group-pos" style="display: none;">
+                        <label for="input-pos">Ambil dari Pos Alokasi</label>
+                        <select id="input-pos" class="form-control" onchange="updateExpensePreview()">
+                            <option value="kebutuhan_pokok">Kebutuhan Pokok (50%)</option>
+                            <option value="investasi">Butir Investasi (30%)</option>
+                            <option value="dana_darurat">Butir Dana Darurat (15%)</option>
+                            <option value="uang_bebas">Butir Uang Bebas (5%)</option>
+                        </select>
+                    </div>
+
                     <div class="form-group">
-                        <label for="input-nominal">Nominal Pendapatan (Rp)</label>
+                        <label for="input-nominal">Nominal (Rp)</label>
                         <input type="text" id="input-nominal" class="form-control" inputmode="numeric" placeholder="0" oninput="handleNominalInput(this)" required>
                     </div>
 
-                    <div class="preview-box" id="live-preview">
-                        <div class="preview-row">
-                            <span>Kebutuhan Pokok (50%)</span>
-                            <span id="prev-pokok">Rp 0</span>
-                        </div>
-                        <div class="preview-row">
-                            <span>Butir Investasi (30%)</span>
-                            <span id="prev-investasi">Rp 0</span>
-                        </div>
-                        <div class="preview-row">
-                            <span>Butir Dana Darurat (15%)</span>
-                            <span id="prev-darurat">Rp 0</span>
-                        </div>
-                        <div class="preview-row">
-                            <span>Butir Uang Bebas (5%)</span>
-                            <span id="prev-bebas">Rp 0</span>
-                        </div>
+                    <!-- Preview Pemasukan -->
+                    <div class="preview-box" id="preview-income">
+                        <div class="preview-row"><span>Kebutuhan Pokok (50%)</span><span id="prev-pokok">Rp 0</span></div>
+                        <div class="preview-row"><span>Butir Investasi (30%)</span><span id="prev-investasi">Rp 0</span></div>
+                        <div class="preview-row"><span>Butir Dana Darurat (15%)</span><span id="prev-darurat">Rp 0</span></div>
+                        <div class="preview-row"><span>Butir Uang Bebas (5%)</span><span id="prev-bebas">Rp 0</span></div>
                     </div>
 
-                    <button type="submit" class="btn-primary">+ Simpan & Alokasikan</button>
+                    <!-- Preview Pengeluaran -->
+                    <div class="preview-box" id="preview-expense" style="display: none;">
+                        <div class="preview-row"><span>Sisa Saldo Pos Terpilih</span><span id="prev-pos-before">Rp 0</span></div>
+                        <div class="preview-row"><span>Sisa Setelah Pengeluaran</span><span id="prev-pos-after">Rp 0</span></div>
+                    </div>
+
+                    <button type="submit" id="btn-submit-tx" class="btn-primary">+ Simpan & Alokasikan</button>
                 </form>
             </div>
         </section>
 
-        <!-- TAB 2: RIWAYAT -->
+        <!-- TAB 2: TANGGA & LEVEL FINANSIAL -->
+        <section id="tab-ladder" class="tab-panel">
+            <div class="summary-card">
+                <div class="summary-label">Posisi Kamu Saat Ini</div>
+                <div class="summary-amount" style="font-size: 20px;" id="ladder-status-title">Level 1: Survival</div>
+                <p style="font-size: 12px; color: #cbd5e1; margin-top: 6px; line-height: 1.45;" id="ladder-status-desc">
+                    Fokus disiplin mencatat anggaran, lunasi utang konsumtif, dan kumpulkan modal awal Rp10 juta.
+                </p>
+                <div class="summary-meta">
+                    <span id="ladder-aset-aktif">Aset Likuid & Invest: Rp 0</span>
+                    <span id="ladder-step-pct">Tangga: 0%</span>
+                </div>
+            </div>
+
+            <!-- 7 Tangga Kekayaan -->
+            <div>
+                <div class="section-header">
+                    <span class="section-title">7 Tangga Kekayaan (Eksekusi Taktis)</span>
+                    <span style="font-size: 12px; font-weight: 700; color: var(--accent-investasi);" id="steps-progress-text">0 / 7 (0%)</span>
+                </div>
+                <div id="seven-steps-container"></div>
+            </div>
+
+            <!-- 5 Level Kebebasan Finansial -->
+            <div>
+                <div class="section-header">
+                    <span class="section-title">5 Level Kebebasan Finansial</span>
+                    <span style="font-size: 11px; color: var(--text-muted);">Persentase Target</span>
+                </div>
+                <div id="five-levels-container"></div>
+            </div>
+        </section>
+
+        <!-- TAB 3: RIWAYAT TRANSAKSI -->
         <section id="tab-history" class="tab-panel">
             <div class="section-header">
-                <span class="section-title">Riwayat Alokasi</span>
-                <span style="font-size: 12px; color: var(--text-muted);" id="history-count">0 item</span>
+                <span class="section-title">Riwayat Mutasi</span>
+                <span style="font-size: 12px; color: var(--text-muted);" id="history-count">0 transaksi</span>
             </div>
+
+            <div class="filter-pills">
+                <button class="pill-btn active" onclick="setHistoryFilter('all', this)">Semua</button>
+                <button class="pill-btn" onclick="setHistoryFilter('pemasukan', this)">Pemasukan</button>
+                <button class="pill-btn" onclick="setHistoryFilter('pengeluaran', this)">Pengeluaran</button>
+            </div>
+
             <div id="history-container" class="history-list"></div>
         </section>
 
-        <!-- TAB 3: DATABASE JSON -->
+        <!-- TAB 4: DATABASE JSON -->
         <section id="tab-database" class="tab-panel">
             <div class="card">
                 <div class="section-header">
                     <span class="section-title">Manajemen Database (db.json)</span>
                 </div>
                 <p class="db-info">
-                    Karena di-hosting sebagai situs statis di Vercel tanpa backend server, aplikasi ini memuat data awal dari file <strong>db.json</strong> dan menyimpan perubahan secara otomatis di penyimpanan lokal perangkat (LocalStorage). Gunakan tombol di bawah untuk sinkronisasi file <strong>db.json</strong>.
+                    Data disimpan otomatis di browser (LocalStorage) dan bisa diekspor/impor ke file <strong>db.json</strong> agar siap sinkron dengan hosting statis Vercel.
                 </p>
                 <div class="btn-grid">
                     <button class="btn-outline" onclick="exportJSON()">Download db.json</button>
@@ -644,7 +930,11 @@
     <nav class="bottom-nav">
         <button class="nav-item active" onclick="switchTab('home', this)">
             <span class="nav-icon">◉</span>
-            <span>Alokasi</span>
+            <span>Dompet</span>
+        </button>
+        <button class="nav-item" onclick="switchTab('ladder', this)">
+            <span class="nav-icon">▲</span>
+            <span>7 Tangga</span>
         </button>
         <button class="nav-item" onclick="switchTab('history', this)">
             <span class="nav-icon">☰</span>
@@ -658,44 +948,80 @@
 </div>
 
 <script>
-    const STORAGE_KEY = 'alokasi_dana_db_v1';
+    const STORAGE_KEY = 'alokasi_dana_timothy_v2';
+    let currentTxMode = 'pemasukan';
+    let historyFilter = 'all';
+
+    const SEVEN_STEPS_META = [
+        {
+            id: 1,
+            title: "Kumpulkan Modal Awal Rp10 Juta",
+            desc: "Pegangan tunai pertama (saldo darurat + investasi minimal Rp10.000.000).",
+            autoCheck: (stats) => stats.asetProduktif >= 10000000
+        },
+        {
+            id: 2,
+            title: "Lunasi Seluruh Utang Konsumtif",
+            desc: "Bebas dari kartu kredit, paylater, dan pinjaman berbunga tinggi."
+        },
+        {
+            id: 3,
+            title: "Bangun Dana Darurat Penuh (12x Pengeluaran)",
+            desc: "Dana darurat likuid setara 12 bulan rata-rata pengeluaran.",
+            autoCheck: (stats) => stats.targetDarurat > 0 && stats.saldo.dana_darurat >= stats.targetDarurat
+        },
+        {
+            id: 4,
+            title: "Investasi Rutin Minimal 20% Penghasilan",
+            desc: "Alokasi rutin ke aset produktif jangka panjang (sistem ini sudah set 30%).",
+            autoCheck: (stats) => stats.totalMasuk > 0 && stats.saldo.investasi > 0
+        },
+        {
+            id: 5,
+            title: "Siapkan Dana Pendidikan Anak Sejak Dini",
+            desc: "Pos terpisah agar biaya pendidikan tidak mengganggu investasi utama."
+        },
+        {
+            id: 6,
+            title: "Lunasi KPR Lebih Cepat",
+            desc: "Gunakan surplus pendapatan/investasi untuk membebaskan arus kas rumah."
+        },
+        {
+            id: 7,
+            title: "Filantropi & Berbagi Kekayaan",
+            desc: "Beri dampak sosial berkelanjutan untuk pendidikan, kesehatan, atau kemanusiaan."
+        }
+    ];
+
     let dbData = {
-        app_name: "Alokasi Dana",
+        app_name: "Alokasi Dana & 7 Tangga Kekayaan",
         rules: {
             kebutuhan_pokok: 0.50,
             investasi: 0.30,
             dana_darurat: 0.15,
             uang_bebas: 0.05
         },
+        completed_steps: [],
         records: []
     };
 
-    // Format Rupiah
+    const POS_LABELS = {
+        kebutuhan_pokok: "Kebutuhan Pokok (50%)",
+        investasi: "Butir Investasi (30%)",
+        dana_darurat: "Butir Dana Darurat (15%)",
+        uang_bebas: "Butir Uang Bebas (5%)"
+    };
+
     function formatRp(angka) {
-        return 'Rp ' + Math.round(angka).toLocaleString('id-ID');
+        const sign = angka < 0 ? '-' : '';
+        return sign + 'Rp ' + Math.abs(Math.round(angka)).toLocaleString('id-ID');
     }
 
-    // Parse angka dari input berformat ribuan
     function parseNominal(str) {
-        const clean = str.replace(/[^0-9]/g, '');
+        const clean = String(str).replace(/[^0-9]/g, '');
         return clean ? parseInt(clean, 10) : 0;
     }
 
-    // Live format input & preview
-    function handleNominalInput(el) {
-        const val = parseNominal(el.value);
-        el.value = val > 0 ? val.toLocaleString('id-ID') : '';
-        updateLivePreview(val);
-    }
-
-    function updateLivePreview(nominal) {
-        document.getElementById('prev-pokok').textContent = formatRp(nominal * 0.50);
-        document.getElementById('prev-investasi').textContent = formatRp(nominal * 0.30);
-        document.getElementById('prev-darurat').textContent = formatRp(nominal * 0.15);
-        document.getElementById('prev-bebas').textContent = formatRp(nominal * 0.05);
-    }
-
-    // Toast notification
     function showToast(msg) {
         const toast = document.getElementById('toast');
         toast.textContent = msg;
@@ -703,18 +1029,451 @@
         setTimeout(() => toast.classList.remove('show'), 2200);
     }
 
-    // Tab Navigation
     function switchTab(tabName, btnEl) {
         document.querySelectorAll('.tab-panel').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
         document.getElementById('tab-' + tabName).classList.add('active');
         btnEl.classList.add('active');
-        if (tabName === 'database') {
-            renderJSONViewer();
+        if (tabName === 'database') renderJSONViewer();
+    }
+
+    // Switch Pemasukan vs Pengeluaran
+    function setTxMode(mode) {
+        currentTxMode = mode;
+        const btnIn = document.getElementById('btn-mode-in');
+        const btnOut = document.getElementById('btn-mode-out');
+        const groupPos = document.getElementById('group-pos');
+        const prevIn = document.getElementById('preview-income');
+        const prevOut = document.getElementById('preview-expense');
+        const labelNama = document.getElementById('label-nama');
+        const inputNama = document.getElementById('input-nama');
+        const btnSubmit = document.getElementById('btn-submit-tx');
+
+        if (mode === 'pemasukan') {
+            btnIn.className = 'mode-btn active-in';
+            btnOut.className = 'mode-btn';
+            groupPos.style.display = 'none';
+            prevIn.style.display = 'flex';
+            prevOut.style.display = 'none';
+            labelNama.textContent = 'Sumber Pemasukan';
+            inputNama.placeholder = 'Contoh: Gaji Bulanan, Proyek Web';
+            btnSubmit.textContent = '+ Simpan & Alokasikan';
+            btnSubmit.classList.remove('btn-danger-submit');
+        } else {
+            btnIn.className = 'mode-btn';
+            btnOut.className = 'mode-btn active-out';
+            groupPos.style.display = 'block';
+            prevIn.style.display = 'none';
+            prevOut.style.display = 'flex';
+            labelNama.textContent = 'Nama Kebutuhan / Pengeluaran';
+            inputNama.placeholder = 'Contoh: Belanja Bulanan, Bayar Listrik, Beli Reksadana';
+            btnSubmit.textContent = '- Catat Pengeluaran';
+            btnSubmit.classList.add('btn-danger-submit');
+            updateExpensePreview();
         }
     }
 
-    // Load Data (LocalStorage -> fallback fetch db.json)
+    function handleNominalInput(el) {
+        const val = parseNominal(el.value);
+        el.value = val > 0 ? val.toLocaleString('id-ID') : '';
+        if (currentTxMode === 'pemasukan') {
+            document.getElementById('prev-pokok').textContent = formatRp(val * 0.50);
+            document.getElementById('prev-investasi').textContent = formatRp(val * 0.30);
+            document.getElementById('prev-darurat').textContent = formatRp(val * 0.15);
+            document.getElementById('prev-bebas').textContent = formatRp(val * 0.05);
+        } else {
+            updateExpensePreview();
+        }
+    }
+
+    function updateExpensePreview() {
+        const stats = calculateStats();
+        const pos = document.getElementById('input-pos').value;
+        const val = parseNominal(document.getElementById('input-nominal').value);
+        const currentBal = stats.saldo[pos] || 0;
+        const afterBal = currentBal - val;
+
+        document.getElementById('prev-pos-before').textContent = formatRp(currentBal);
+        const afterEl = document.getElementById('prev-pos-after');
+        afterEl.textContent = formatRp(afterBal);
+        afterEl.style.color = afterBal < 0 ? 'var(--danger)' : 'var(--text-main)';
+    }
+
+    // Hitung Semua Saldo & Statistik
+    function calculateStats() {
+        let totalMasuk = 0;
+        let totalKeluar = 0;
+
+        const masukPos = { kebutuhan_pokok: 0, investasi: 0, dana_darurat: 0, uang_bebas: 0 };
+        const keluarPos = { kebutuhan_pokok: 0, investasi: 0, dana_darurat: 0, uang_bebas: 0 };
+
+        dbData.records.forEach(item => {
+            const tipe = item.tipe || 'pemasukan';
+            if (tipe === 'pemasukan') {
+                totalMasuk += item.nominal;
+                masukPos.kebutuhan_pokok += item.alokasi.kebutuhan_pokok;
+                masukPos.investasi += item.alokasi.investasi;
+                masukPos.dana_darurat += item.alokasi.dana_darurat;
+                masukPos.uang_bebas += item.alokasi.uang_bebas;
+            } else {
+                totalKeluar += item.nominal;
+                if (keluarPos[item.pos] !== undefined) {
+                    keluarPos[item.pos] += item.nominal;
+                }
+            }
+        });
+
+        const saldo = {
+            kebutuhan_pokok: masukPos.kebutuhan_pokok - keluarPos.kebutuhan_pokok,
+            investasi: masukPos.investasi - keluarPos.investasi,
+            dana_darurat: masukPos.dana_darurat - keluarPos.dana_darurat,
+            uang_bebas: masukPos.uang_bebas - keluarPos.uang_bebas
+        };
+
+        const totalSaldo = totalMasuk - totalKeluar;
+        // Aset produktif & likuid (Dana Darurat + Investasi)
+        const asetProduktif = Math.max(0, saldo.dana_darurat) + Math.max(0, saldo.investasi);
+
+        // Estimasi pengeluaran bulanan untuk target 12x dana darurat (minimal pakai 50% pemasukan jika pengeluaran belum dicatat)
+        const basisPengeluaranBulanan = totalKeluar > 0 ? totalKeluar : (totalMasuk * 0.50);
+        const targetDarurat = basisPengeluaranBulanan * 12;
+
+        return {
+            totalMasuk,
+            totalKeluar,
+            totalSaldo,
+            saldo,
+            keluarPos,
+            asetProduktif,
+            targetDarurat
+        };
+    }
+
+    // Submit Transaksi
+    function handleTxSubmit(e) {
+        e.preventDefault();
+        const namaInput = document.getElementById('input-nama');
+        const nominalInput = document.getElementById('input-nominal');
+        const nama = namaInput.value.trim();
+        const nominal = parseNominal(nominalInput.value);
+
+        if (!nama || nominal <= 0) {
+            showToast('Isi keterangan dan nominal yang valid');
+            return;
+        }
+
+        const tanggal = new Date().toLocaleDateString('id-ID', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric'
+        });
+
+        if (currentTxMode === 'pemasukan') {
+            dbData.records.unshift({
+                id: Date.now(),
+                tipe: 'pemasukan',
+                nama: nama,
+                nominal: nominal,
+                alokasi: {
+                    kebutuhan_pokok: nominal * 0.50,
+                    investasi: nominal * 0.30,
+                    dana_darurat: nominal * 0.15,
+                    uang_bebas: nominal * 0.05
+                },
+                tanggal: tanggal
+            });
+            showToast('Pemasukan berhasil dialokasikan');
+        } else {
+            const pos = document.getElementById('input-pos').value;
+            dbData.records.unshift({
+                id: Date.now(),
+                tipe: 'pengeluaran',
+                nama: nama,
+                pos: pos,
+                nominal: nominal,
+                tanggal: tanggal
+            });
+            showToast('Pengeluaran berhasil dicatat');
+        }
+
+        saveToLocal();
+        renderAll();
+
+        namaInput.value = '';
+        nominalInput.value = '';
+        handleNominalInput(nominalInput);
+    }
+
+    function deleteRecord(id) {
+        dbData.records = dbData.records.filter(item => item.id !== id);
+        saveToLocal();
+        renderAll();
+        showToast('Transaksi dihapus');
+    }
+
+    // Toggle 7 Tangga Kekayaan
+    function toggleStep(stepId) {
+        if (!Array.isArray(dbData.completed_steps)) {
+            dbData.completed_steps = [];
+        }
+        const idx = dbData.completed_steps.indexOf(stepId);
+        if (idx > -1) {
+            dbData.completed_steps.splice(idx, 1);
+        } else {
+            dbData.completed_steps.push(stepId);
+        }
+        saveToLocal();
+        renderAll();
+    }
+
+    // Render Semua Komponen
+    function renderAll() {
+        const stats = calculateStats();
+
+        // Update Dompet
+        document.getElementById('total-saldo').textContent = formatRp(stats.totalSaldo);
+        document.getElementById('meta-pemasukan').textContent = 'Masuk: ' + formatRp(stats.totalMasuk);
+        document.getElementById('meta-pengeluaran').textContent = 'Keluar: ' + formatRp(stats.totalKeluar);
+
+        document.getElementById('bal-pokok').textContent = formatRp(stats.saldo.kebutuhan_pokok);
+        document.getElementById('sub-pokok').textContent = 'Terpakai: ' + formatRp(stats.keluarPos.kebutuhan_pokok);
+
+        document.getElementById('bal-investasi').textContent = formatRp(stats.saldo.investasi);
+        document.getElementById('sub-investasi').textContent = 'Terpakai: ' + formatRp(stats.keluarPos.investasi);
+
+        document.getElementById('bal-darurat').textContent = formatRp(stats.saldo.dana_darurat);
+        document.getElementById('sub-darurat').textContent = 'Terpakai: ' + formatRp(stats.keluarPos.dana_darurat);
+
+        document.getElementById('bal-bebas').textContent = formatRp(stats.saldo.uang_bebas);
+        document.getElementById('sub-bebas').textContent = 'Terpakai: ' + formatRp(stats.keluarPos.uang_bebas);
+
+        renderLadderAndLevels(stats);
+        renderHistory();
+        renderJSONViewer();
+        if (currentTxMode === 'pengeluaran') updateExpensePreview();
+    }
+
+    // Render 7 Tangga & 5 Level Kebebasan Finansial
+    function renderLadderAndLevels(stats) {
+        if (!Array.isArray(dbData.completed_steps)) dbData.completed_steps = [];
+
+        // Sinkronisasi otomatis langkah yang tercapai dari angka saldo
+        let activeSteps = new Set(dbData.completed_steps);
+        SEVEN_STEPS_META.forEach(step => {
+            if (step.autoCheck && step.autoCheck(stats)) {
+                activeSteps.add(step.id);
+            }
+        });
+
+        const completedCount = activeSteps.size;
+        const stepsPct = Math.round((completedCount / 7) * 100);
+
+        document.getElementById('steps-progress-text').textContent = `${completedCount} / 7 (${stepsPct}%)`;
+        document.getElementById('summary-step-label').textContent = `7 Tangga Kekayaan: ${completedCount}/7 (${stepsPct}%)`;
+        document.getElementById('summary-step-bar').style.width = `${stepsPct}%`;
+        document.getElementById('ladder-step-pct').textContent = `Tangga: ${stepsPct}%`;
+        document.getElementById('ladder-aset-aktif').textContent = `Aset Darurat + Invest: ${formatRp(stats.asetProduktif)}`;
+
+        // Render Checklist 7 Tangga
+        const stepsContainer = document.getElementById('seven-steps-container');
+        stepsContainer.innerHTML = SEVEN_STEPS_META.map(step => {
+            const isAuto = step.autoCheck && step.autoCheck(stats);
+            const isChecked = activeSteps.has(step.id);
+            return `
+                <label class="step-item ${isChecked ? 'completed' : ''}">
+                    <input type="checkbox" class="step-checkbox" ${isChecked ? 'checked' : ''} onchange="toggleStep(${step.id})">
+                    <div class="step-content">
+                        <div class="step-top">
+                            <span class="step-num">Tangga ${step.id}</span>
+                            ${isAuto ? '<span class="step-auto-tag">Tercapai Otomatis</span>' : ''}
+                        </div>
+                        <div class="step-title">${step.title}</div>
+                        <div class="step-desc">${step.desc}</div>
+                    </div>
+                </label>
+            `;
+        }).join('');
+
+        // Kalkulasi Persentase 5 Level Kebebasan Finansial
+        const TARGET_FI = 15000000000;   // Rp 15 Miliar
+        const TARGET_FF = 150000000000;  // Rp 150 Miliar
+        const TARGET_FP = 500000000000;  // Acuan Purpose > Rp 500 Miliar
+
+        const pctLv1 = stats.asetProduktif > 0 ? Math.min(100, (stats.asetProduktif / 10000000) * 100) : 0;
+        const pctLv2 = stats.targetDarurat > 0 ? Math.min(100, (stats.saldo.dana_darurat / stats.targetDarurat) * 100) : 0;
+        const pctLv3 = Math.min(100, (stats.asetProduktif / TARGET_FI) * 100);
+        const pctLv4 = Math.min(100, (stats.asetProduktif / TARGET_FF) * 100);
+        const pctLv5 = activeSteps.has(7) && stats.asetProduktif >= TARGET_FF ? 100 : Math.min(100, (stats.asetProduktif / TARGET_FP) * 100);
+
+        // Tentukan Level Aktif Saat Ini
+        let currentLevel = 1;
+        let levelTitle = "Level 1: Survival (Bertahan Hidup)";
+        let levelDesc = "Fokus catat anggaran, lunasi utang konsumtif, dan kumpulkan modal awal Rp10 juta.";
+        let nextTargetText = "Target Lv 2: 12x Pengeluaran";
+
+        if (stats.asetProduktif >= TARGET_FF && activeSteps.has(7)) {
+            currentLevel = 5;
+            levelTitle = "Level 5: Financial Purpose (Tujuan Finansial)";
+            levelDesc = "Kekayaan dialokasikan untuk dampak luas bagi pendidikan, kesehatan, dan kemanusiaan.";
+            nextTargetText = "Level Tertinggi Tercapai";
+        } else if (stats.asetProduktif >= TARGET_FF) {
+            currentLevel = 4;
+            levelTitle = "Level 4: Financial Freedom (~Rp150 Miliar)";
+            levelDesc = "Merdeka sepenuhnya atas waktu dan lokasi tanpa terikat jadwal kerja.";
+            nextTargetText = "Target Lv 5: Filantropi & Dampak Sosial";
+        } else if (stats.asetProduktif >= TARGET_FI) {
+            currentLevel = 3;
+            levelTitle = "Level 3: Financial Independence (~Rp15 Miliar)";
+            levelDesc = "Biaya hidup ditopang sepenuhnya oleh imbal hasil investasi tanpa wajib bekerja.";
+            nextTargetText = `Menuju Lv 4: ${pctLv4.toFixed(2)}%`;
+        } else if (stats.targetDarurat > 0 && stats.saldo.dana_darurat >= stats.targetDarurat) {
+            currentLevel = 2;
+            levelTitle = "Level 2: Financial Stability (Stabilitas)";
+            levelDesc = "Dana darurat 12 bulan terpenuhi. Waspada 'zona tipuan', terus agresif bangun investasi.";
+            nextTargetText = `Menuju Lv 3 (15M): ${pctLv3.toFixed(2)}%`;
+        } else {
+            nextTargetText = `Menuju Lv 2: ${Math.max(0, pctLv2).toFixed(1)}%`;
+        }
+
+        document.getElementById('badge-current-level').textContent = `Level ${currentLevel}`;
+        document.getElementById('summary-next-target').textContent = nextTargetText;
+        document.getElementById('ladder-status-title').textContent = levelTitle;
+        document.getElementById('ladder-status-desc').textContent = levelDesc;
+
+        const levelsData = [
+            {
+                lvl: 1,
+                name: "1. Survival (Bertahan Hidup)",
+                pct: Math.max(0, pctLv1),
+                desc: "Hidup dari gaji ke gaji / membangun fondasi awal Rp10 juta pertama dan bebas utang konsumtif."
+            },
+            {
+                lvl: 2,
+                name: "2. Financial Stability (Dana Darurat 12 Bulan)",
+                pct: Math.max(0, pctLv2),
+                desc: `Dana darurat likuid setara 12x pengeluaran (${formatRp(stats.targetDarurat)}). Waspada zona nyaman.`
+            },
+            {
+                lvl: 3,
+                name: "3. Financial Independence (Target ~Rp15 Miliar)",
+                pct: Math.max(0, pctLv3),
+                desc: "Biaya hidup ditopang imbal hasil investasi (>15% CAGR) tanpa wajib bekerja lagi."
+            },
+            {
+                lvl: 4,
+                name: "4. Financial Freedom (Target ~Rp150 Miliar)",
+                pct: Math.max(0, pctLv4),
+                desc: "Kemerdekaan penuh atas waktu dan lokasi dengan gaya hidup mandiri sepenuhnya."
+            },
+            {
+                lvl: 5,
+                name: "5. Financial Purpose (Dampak Masyarakat)",
+                pct: Math.max(0, pctLv5),
+                desc: "Kekayaan difokuskan untuk mendanai pendidikan, kesehatan, teknologi, atau aksi kemanusiaan."
+            }
+        ];
+
+        document.getElementById('five-levels-container').innerHTML = levelsData.map(item => {
+            const pctFormatted = item.pct < 1 && item.pct > 0 ? item.pct.toFixed(2) : item.pct.toFixed(1);
+            return `
+                <div class="level-card ${item.lvl === currentLevel ? 'current-level' : ''}">
+                    <div class="level-header">
+                        <span class="level-title">${item.name}</span>
+                        <span class="level-pct">${pctFormatted}%</span>
+                    </div>
+                    <div class="level-desc">${item.desc}</div>
+                    <div class="level-bar">
+                        <div class="level-bar-fill" style="width: ${Math.min(100, item.pct)}%;"></div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // Filter & Render Riwayat
+    function setHistoryFilter(filter, btnEl) {
+        historyFilter = filter;
+        document.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+        btnEl.classList.add('active');
+        renderHistory();
+    }
+
+    function renderHistory() {
+        const container = document.getElementById('history-container');
+        const filtered = dbData.records.filter(item => {
+            const tipe = item.tipe || 'pemasukan';
+            if (historyFilter === 'all') return true;
+            return tipe === historyFilter;
+        });
+
+        document.getElementById('history-count').textContent = `${filtered.length} transaksi`;
+
+        if (filtered.length === 0) {
+            container.innerHTML = '<div class="empty-state">Belum ada catatan transaksi pada filter ini.</div>';
+            return;
+        }
+
+        container.innerHTML = filtered.map(item => {
+            const tipe = item.tipe || 'pemasukan';
+            if (tipe === 'pemasukan') {
+                return `
+                    <div class="history-item">
+                        <div class="history-header">
+                            <div>
+                                <div class="history-title">${escapeHTML(item.nama)}</div>
+                                <div class="history-meta">
+                                    <span class="bucket-badge badge-investasi">Pemasukan</span>
+                                    <span>${escapeHTML(item.tanggal || '-')}</span>
+                                </div>
+                            </div>
+                            <div class="history-right">
+                                <span class="amount-in">+${formatRp(item.nominal)}</span>
+                                <button class="btn-delete" onclick="deleteRecord(${item.id})" title="Hapus">×</button>
+                            </div>
+                        </div>
+                        <div class="history-breakdown">
+                            <div class="hb-item"><span>Pokok (50%):</span> <strong>${formatRp(item.alokasi.kebutuhan_pokok)}</strong></div>
+                            <div class="hb-item"><span>Investasi (30%):</span> <strong>${formatRp(item.alokasi.investasi)}</strong></div>
+                            <div class="hb-item"><span>Darurat (15%):</span> <strong>${formatRp(item.alokasi.dana_darurat)}</strong></div>
+                            <div class="hb-item"><span>Bebas (5%):</span> <strong>${formatRp(item.alokasi.uang_bebas)}</strong></div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                const badgeClass = {
+                    kebutuhan_pokok: 'badge-pokok',
+                    investasi: 'badge-investasi',
+                    dana_darurat: 'badge-darurat',
+                    uang_bebas: 'badge-bebas'
+                }[item.pos] || 'badge-pokok';
+
+                return `
+                    <div class="history-item">
+                        <div class="history-header">
+                            <div>
+                                <div class="history-title">${escapeHTML(item.nama)}</div>
+                                <div class="history-meta">
+                                    <span class="bucket-badge ${badgeClass}">${POS_LABELS[item.pos] || item.pos}</span>
+                                    <span>${escapeHTML(item.tanggal || '-')}</span>
+                                </div>
+                            </div>
+                            <div class="history-right">
+                                <span class="amount-out">-${formatRp(item.nominal)}</span>
+                                <button class="btn-delete" onclick="deleteRecord(${item.id})" title="Hapus">×</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        }).join('');
+    }
+
+    function renderJSONViewer() {
+        const el = document.getElementById('json-preview');
+        if (el) el.textContent = JSON.stringify(dbData, null, 2);
+    }
+
+    // LocalStorage & db.json Sync
     async function initApp() {
         const local = localStorage.getItem(STORAGE_KEY);
         if (local) {
@@ -723,7 +1482,7 @@
                 renderAll();
                 return;
             } catch (e) {
-                console.error('Local data rusak, memuat db.json');
+                console.error('Data lokal tidak valid, memuat db.json');
             }
         }
         await fetchServerDB(false);
@@ -741,7 +1500,6 @@
                 if (notify) showToast('Data dimuat dari db.json');
             }
         } catch (err) {
-            // Jika dibuka langsung via file:// tanpa server lokal
             saveToLocal();
             renderAll();
             if (notify) showToast('Menggunakan penyimpanan lokal');
@@ -753,121 +1511,6 @@
         renderJSONViewer();
     }
 
-    // Tambah Pendapatan
-    function handleAddIncome(e) {
-        e.preventDefault();
-        const namaInput = document.getElementById('input-nama');
-        const nominalInput = document.getElementById('input-nominal');
-
-        const nama = namaInput.value.trim();
-        const pendapatan = parseNominal(nominalInput.value);
-
-        if (!nama || pendapatan <= 0) {
-            showToast('Isi nama dan nominal yang valid');
-            return;
-        }
-
-        const record = {
-            id: Date.now(),
-            nama: nama,
-            pendapatan: pendapatan,
-            alokasi: {
-                kebutuhan_pokok: pendapatan * 0.50,
-                investasi: pendapatan * 0.30,
-                dana_darurat: pendapatan * 0.15,
-                uang_bebas: pendapatan * 0.05
-            },
-            tanggal: new Date().toLocaleDateString('id-ID', {
-                day: '2-digit',
-                month: 'short',
-                year: 'numeric'
-            })
-        };
-
-        dbData.records.unshift(record);
-        saveToLocal();
-        renderAll();
-
-        namaInput.value = '';
-        nominalInput.value = '';
-        updateLivePreview(0);
-        showToast('Pendapatan berhasil dialokasikan');
-    }
-
-    // Hapus Item
-    function deleteRecord(id) {
-        dbData.records = dbData.records.filter(item => item.id !== id);
-        saveToLocal();
-        renderAll();
-        showToast('Data dihapus');
-    }
-
-    // Render Summary & History
-    function renderAll() {
-        let totalPendapatan = 0;
-        let totalPokok = 0;
-        let totalInvestasi = 0;
-        let totalDarurat = 0;
-        let totalBebas = 0;
-
-        dbData.records.forEach(item => {
-            totalPendapatan += item.pendapatan;
-            totalPokok += item.alokasi.kebutuhan_pokok;
-            totalInvestasi += item.alokasi.investasi;
-            totalDarurat += item.alokasi.dana_darurat;
-            totalBebas += item.alokasi.uang_bebas;
-        });
-
-        document.getElementById('total-pendapatan').textContent = formatRp(totalPendapatan);
-        document.getElementById('total-transaksi').textContent = dbData.records.length + ' Transaksi tercatat';
-        document.getElementById('sum-pokok').textContent = formatRp(totalPokok);
-        document.getElementById('sum-investasi').textContent = formatRp(totalInvestasi);
-        document.getElementById('sum-darurat').textContent = formatRp(totalDarurat);
-        document.getElementById('sum-bebas').textContent = formatRp(totalBebas);
-
-        renderHistory();
-        renderJSONViewer();
-    }
-
-    function renderHistory() {
-        const container = document.getElementById('history-container');
-        document.getElementById('history-count').textContent = dbData.records.length + ' item';
-
-        if (dbData.records.length === 0) {
-            container.innerHTML = '<div class="empty-state">Belum ada data pendapatan.<br>Tambahkan melalui tab Alokasi.</div>';
-            return;
-        }
-
-        container.innerHTML = dbData.records.map(item => `
-            <div class="history-item">
-                <div class="history-header">
-                    <div>
-                        <div class="history-title">${escapeHTML(item.nama)}</div>
-                        <div class="history-date">${escapeHTML(item.tanggal || '-')}</div>
-                    </div>
-                    <div class="history-right">
-                        <span class="history-total">${formatRp(item.pendapatan)}</span>
-                        <button class="btn-delete" onclick="deleteRecord(${item.id})" title="Hapus">×</button>
-                    </div>
-                </div>
-                <div class="history-breakdown">
-                    <div class="hb-item"><span>Pokok (50%):</span> <strong>${formatRp(item.alokasi.kebutuhan_pokok)}</strong></div>
-                    <div class="hb-item"><span>Investasi (30%):</span> <strong>${formatRp(item.alokasi.investasi)}</strong></div>
-                    <div class="hb-item"><span>Darurat (15%):</span> <strong>${formatRp(item.alokasi.dana_darurat)}</strong></div>
-                    <div class="hb-item"><span>Bebas (5%):</span> <strong>${formatRp(item.alokasi.uang_bebas)}</strong></div>
-                </div>
-            </div>
-        `).join('');
-    }
-
-    function renderJSONViewer() {
-        const el = document.getElementById('json-preview');
-        if (el) {
-            el.textContent = JSON.stringify(dbData, null, 2);
-        }
-    }
-
-    // Export db.json
     function exportJSON() {
         const dataStr = JSON.stringify(dbData, null, 2);
         const blob = new Blob([dataStr], { type: 'application/json' });
@@ -882,11 +1525,9 @@
         showToast('db.json berhasil diunduh');
     }
 
-    // Import db.json
     function importJSON(event) {
         const file = event.target.files[0];
         if (!file) return;
-
         const reader = new FileReader();
         reader.onload = function(e) {
             try {
