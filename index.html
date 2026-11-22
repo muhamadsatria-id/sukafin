@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Alokasi Dana - Budget Tracker</title>
+    <style>
+        :root {
+            --bg-app: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --primary: #0f172a;
+            --primary-hover: #1e293b;
+            --accent-pokok: #2563eb;
+            --accent-investasi: #059669;
+            --accent-darurat: #d97706;
+            --accent-bebas: #7c3aed;
+            --danger: #dc2626;
+            --radius-lg: 16px;
+            --radius-md: 12px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #e2e8f0;
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .app-shell {
+            width: 100%;
+            max-width: 480px;
+            background-color: var(--bg-app);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 25px rgba(0,0,0,0.08);
+            position: relative;
+            padding-bottom: 84px;
+        }
+
+        /* Header */
+        header {
+            background-color: var(--bg-card);
+            padding: 18px 20px 14px;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title h1 {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .header-title p {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-icon {
+            background: var(--bg-app);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 7px 10px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: background 0.15s;
+        }
+
+        .btn-icon:active {
+            background: #e2e8f0;
+        }
+
+        /* Main Content */
+        main {
+            padding: 16px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .tab-panel {
+            display: none;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .tab-panel.active {
+            display: flex;
+        }
+
+        /* Total Card */
+        .summary-card {
+            background: var(--primary);
+            color: #ffffff;
+            border-radius: var(--radius-lg);
+            padding: 20px;
+        }
+
+        .summary-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #94a3b8;
+            font-weight: 600;
+        }
+
+        .summary-amount {
+            font-size: 28px;
+            font-weight: 700;
+            margin-top: 6px;
+            letter-spacing: -0.02em;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .summary-meta {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255,255,255,0.12);
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #cbd5e1;
+        }
+
+        /* Bucket Grid */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .bucket-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .bucket-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 14px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .bucket-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .bucket-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .bucket-badge {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 6px;
+        }
+
+        .badge-pokok { background: #dbeafe; color: var(--accent-pokok); }
+        .badge-investasi { background: #d1fae5; color: var(--accent-investasi); }
+        .badge-darurat { background: #fef3c7; color: var(--accent-darurat); }
+        .badge-bebas { background: #ede9fe; color: var(--accent-bebas); }
+
+        .bucket-value {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-main);
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Form Card */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 11px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 15px;
+            color: var(--text-main);
+            background: var(--bg-app);
+            outline: none;
+            transition: border-color 0.15s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            background: #ffffff;
+        }
+
+        .preview-box {
+            background: var(--bg-app);
+            border: 1px dashed #cbd5e1;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            font-size: 12px;
+        }
+
+        .preview-row {
+            display: flex;
+            justify-content: space-between;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .preview-row span:first-child {
+            color: var(--text-muted);
+        }
+
+        .preview-row span:last-child {
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            width: 100%;
+            background: var(--primary);
+            color: #ffffff;
+            border: none;
+            padding: 13px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .btn-primary:active {
+            background: var(--primary-hover);
+        }
+
+        /* History List */
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .history-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 14px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .history-title {
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .history-date {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .history-right {
+            text-align: right;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .history-total {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--accent-investasi);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .btn-delete {
+            background: #fee2e2;
+            color: var(--danger);
+            border: none;
+            width: 26px;
+            height: 26px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .history-breakdown {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            padding-top: 10px;
+            border-top: 1px solid var(--border-color);
+            font-size: 11px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .hb-item {
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-muted);
+        }
+
+        .hb-item strong {
+            color: var(--text-main);
+            font-weight: 600;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 36px 20px;
+            color: var(--text-muted);
+            font-size: 13px;
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            border: 1px dashed var(--border-color);
+        }
+
+        /* JSON DB Management */
+        .db-info {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        .btn-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .btn-outline {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 11px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .btn-danger-outline {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: var(--danger);
+            padding: 11px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        pre.json-viewer {
+            background: #0f172a;
+            color: #e2e8f0;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 11px;
+            overflow-x: auto;
+            max-height: 220px;
+            margin-top: 12px;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        }
+
+        /* Bottom Navigation */
+        nav.bottom-nav {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            max-width: 480px;
+            background: var(--bg-card);
+            border-top: 1px solid var(--border-color);
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
+            z-index: 30;
+        }
+
+        .nav-item {
+            background: none;
+            border: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 4px 0;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+        }
+
+        .nav-icon {
+            font-size: 18px;
+            line-height: 1;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 72px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-10px);
+            background: #0f172a;
+            color: #ffffff;
+            padding: 10px 16px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.2s ease;
+            z-index: 50;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-shell">
+    <header>
+        <div class="header-title">
+            <h1>Alokasi Dana</h1>
+            <p>50% Pokok • 30% Invest • 15% Darurat • 5% Bebas</p>
+        </div>
+        <div class="header-actions">
+            <button class="btn-icon" onclick="exportJSON()" title="Download db.json">
+                ↓ JSON
+            </button>
+        </div>
+    </header>
+
+    <div id="toast" class="toast">Tersimpan</div>
+
+    <main>
+        <!-- TAB 1: BERANDA & INPUT -->
+        <section id="tab-home" class="tab-panel active">
+            <div class="summary-card">
+                <div class="summary-label">Total Akumulasi Pendapatan</div>
+                <div class="summary-amount" id="total-pendapatan">Rp 0</div>
+                <div class="summary-meta">
+                    <span id="total-transaksi">0 Transaksi tercatat</span>
+                    <span>DB: db.json</span>
+                </div>
+            </div>
+
+            <div>
+                <div class="section-header">
+                    <span class="section-title">Saldo Tiap Pos</span>
+                </div>
+                <div class="bucket-grid">
+                    <div class="bucket-card">
+                        <div class="bucket-top">
+                            <span class="bucket-name">Kebutuhan Pokok</span>
+                            <span class="bucket-badge badge-pokok">50%</span>
+                        </div>
+                        <div class="bucket-value" id="sum-pokok">Rp 0</div>
+                    </div>
+                    <div class="bucket-card">
+                        <div class="bucket-top">
+                            <span class="bucket-name">Butir Investasi</span>
+                            <span class="bucket-badge badge-investasi">30%</span>
+                        </div>
+                        <div class="bucket-value" id="sum-investasi">Rp 0</div>
+                    </div>
+                    <div class="bucket-card">
+                        <div class="bucket-top">
+                            <span class="bucket-name">Dana Darurat</span>
+                            <span class="bucket-badge badge-darurat">15%</span>
+                        </div>
+                        <div class="bucket-value" id="sum-darurat">Rp 0</div>
+                    </div>
+                    <div class="bucket-card">
+                        <div class="bucket-top">
+                            <span class="bucket-name">Uang Bebas</span>
+                            <span class="bucket-badge badge-bebas">5%</span>
+                        </div>
+                        <div class="bucket-value" id="sum-bebas">Rp 0</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="section-header">
+                    <span class="section-title">Catat Pendapatan Baru</span>
+                </div>
+                <form id="income-form" onsubmit="handleAddIncome(event)">
+                    <div class="form-group">
+                        <label for="input-nama">Nama / Sumber Pendapatan</label>
+                        <input type="text" id="input-nama" class="form-control" placeholder="Contoh: Gaji Bulanan, Proyek Web" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="input-nominal">Nominal Pendapatan (Rp)</label>
+                        <input type="text" id="input-nominal" class="form-control" inputmode="numeric" placeholder="0" oninput="handleNominalInput(this)" required>
+                    </div>
+
+                    <div class="preview-box" id="live-preview">
+                        <div class="preview-row">
+                            <span>Kebutuhan Pokok (50%)</span>
+                            <span id="prev-pokok">Rp 0</span>
+                        </div>
+                        <div class="preview-row">
+                            <span>Butir Investasi (30%)</span>
+                            <span id="prev-investasi">Rp 0</span>
+                        </div>
+                        <div class="preview-row">
+                            <span>Butir Dana Darurat (15%)</span>
+                            <span id="prev-darurat">Rp 0</span>
+                        </div>
+                        <div class="preview-row">
+                            <span>Butir Uang Bebas (5%)</span>
+                            <span id="prev-bebas">Rp 0</span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-primary">+ Simpan & Alokasikan</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- TAB 2: RIWAYAT -->
+        <section id="tab-history" class="tab-panel">
+            <div class="section-header">
+                <span class="section-title">Riwayat Alokasi</span>
+                <span style="font-size: 12px; color: var(--text-muted);" id="history-count">0 item</span>
+            </div>
+            <div id="history-container" class="history-list"></div>
+        </section>
+
+        <!-- TAB 3: DATABASE JSON -->
+        <section id="tab-database" class="tab-panel">
+            <div class="card">
+                <div class="section-header">
+                    <span class="section-title">Manajemen Database (db.json)</span>
+                </div>
+                <p class="db-info">
+                    Karena di-hosting sebagai situs statis di Vercel tanpa backend server, aplikasi ini memuat data awal dari file <strong>db.json</strong> dan menyimpan perubahan secara otomatis di penyimpanan lokal perangkat (LocalStorage). Gunakan tombol di bawah untuk sinkronisasi file <strong>db.json</strong>.
+                </p>
+                <div class="btn-grid">
+                    <button class="btn-outline" onclick="exportJSON()">Download db.json</button>
+                    <label class="btn-outline" style="cursor: pointer;">
+                        Import db.json
+                        <input type="file" id="import-file" accept=".json" style="display: none;" onchange="importJSON(event)">
+                    </label>
+                </div>
+                <button class="btn-danger-outline" onclick="resetToDefaultDB()">Muat Ulang dari db.json Server</button>
+
+                <pre class="json-viewer" id="json-preview"></pre>
+            </div>
+        </section>
+    </main>
+
+    <nav class="bottom-nav">
+        <button class="nav-item active" onclick="switchTab('home', this)">
+            <span class="nav-icon">◉</span>
+            <span>Alokasi</span>
+        </button>
+        <button class="nav-item" onclick="switchTab('history', this)">
+            <span class="nav-icon">☰</span>
+            <span>Riwayat</span>
+        </button>
+        <button class="nav-item" onclick="switchTab('database', this)">
+            <span class="nav-icon">{ }</span>
+            <span>Database</span>
+        </button>
+    </nav>
+</div>
+
+<script>
+    const STORAGE_KEY = 'alokasi_dana_db_v1';
+    let dbData = {
+        app_name: "Alokasi Dana",
+        rules: {
+            kebutuhan_pokok: 0.50,
+            investasi: 0.30,
+            dana_darurat: 0.15,
+            uang_bebas: 0.05
+        },
+        records: []
+    };
+
+    // Format Rupiah
+    function formatRp(angka) {
+        return 'Rp ' + Math.round(angka).toLocaleString('id-ID');
+    }
+
+    // Parse angka dari input berformat ribuan
+    function parseNominal(str) {
+        const clean = str.replace(/[^0-9]/g, '');
+        return clean ? parseInt(clean, 10) : 0;
+    }
+
+    // Live format input & preview
+    function handleNominalInput(el) {
+        const val = parseNominal(el.value);
+        el.value = val > 0 ? val.toLocaleString('id-ID') : '';
+        updateLivePreview(val);
+    }
+
+    function updateLivePreview(nominal) {
+        document.getElementById('prev-pokok').textContent = formatRp(nominal * 0.50);
+        document.getElementById('prev-investasi').textContent = formatRp(nominal * 0.30);
+        document.getElementById('prev-darurat').textContent = formatRp(nominal * 0.15);
+        document.getElementById('prev-bebas').textContent = formatRp(nominal * 0.05);
+    }
+
+    // Toast notification
+    function showToast(msg) {
+        const toast = document.getElementById('toast');
+        toast.textContent = msg;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2200);
+    }
+
+    // Tab Navigation
+    function switchTab(tabName, btnEl) {
+        document.querySelectorAll('.tab-panel').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        document.getElementById('tab-' + tabName).classList.add('active');
+        btnEl.classList.add('active');
+        if (tabName === 'database') {
+            renderJSONViewer();
+        }
+    }
+
+    // Load Data (LocalStorage -> fallback fetch db.json)
+    async function initApp() {
+        const local = localStorage.getItem(STORAGE_KEY);
+        if (local) {
+            try {
+                dbData = JSON.parse(local);
+                renderAll();
+                return;
+            } catch (e) {
+                console.error('Local data rusak, memuat db.json');
+            }
+        }
+        await fetchServerDB(false);
+    }
+
+    async function fetchServerDB(notify = true) {
+        try {
+            const res = await fetch('./db.json?t=' + Date.now());
+            if (!res.ok) throw new Error('Gagal memuat db.json');
+            const json = await res.json();
+            if (json && Array.isArray(json.records)) {
+                dbData = json;
+                saveToLocal();
+                renderAll();
+                if (notify) showToast('Data dimuat dari db.json');
+            }
+        } catch (err) {
+            // Jika dibuka langsung via file:// tanpa server lokal
+            saveToLocal();
+            renderAll();
+            if (notify) showToast('Menggunakan penyimpanan lokal');
+        }
+    }
+
+    function saveToLocal() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(dbData));
+        renderJSONViewer();
+    }
+
+    // Tambah Pendapatan
+    function handleAddIncome(e) {
+        e.preventDefault();
+        const namaInput = document.getElementById('input-nama');
+        const nominalInput = document.getElementById('input-nominal');
+
+        const nama = namaInput.value.trim();
+        const pendapatan = parseNominal(nominalInput.value);
+
+        if (!nama || pendapatan <= 0) {
+            showToast('Isi nama dan nominal yang valid');
+            return;
+        }
+
+        const record = {
+            id: Date.now(),
+            nama: nama,
+            pendapatan: pendapatan,
+            alokasi: {
+                kebutuhan_pokok: pendapatan * 0.50,
+                investasi: pendapatan * 0.30,
+                dana_darurat: pendapatan * 0.15,
+                uang_bebas: pendapatan * 0.05
+            },
+            tanggal: new Date().toLocaleDateString('id-ID', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric'
+            })
+        };
+
+        dbData.records.unshift(record);
+        saveToLocal();
+        renderAll();
+
+        namaInput.value = '';
+        nominalInput.value = '';
+        updateLivePreview(0);
+        showToast('Pendapatan berhasil dialokasikan');
+    }
+
+    // Hapus Item
+    function deleteRecord(id) {
+        dbData.records = dbData.records.filter(item => item.id !== id);
+        saveToLocal();
+        renderAll();
+        showToast('Data dihapus');
+    }
+
+    // Render Summary & History
+    function renderAll() {
+        let totalPendapatan = 0;
+        let totalPokok = 0;
+        let totalInvestasi = 0;
+        let totalDarurat = 0;
+        let totalBebas = 0;
+
+        dbData.records.forEach(item => {
+            totalPendapatan += item.pendapatan;
+            totalPokok += item.alokasi.kebutuhan_pokok;
+            totalInvestasi += item.alokasi.investasi;
+            totalDarurat += item.alokasi.dana_darurat;
+            totalBebas += item.alokasi.uang_bebas;
+        });
+
+        document.getElementById('total-pendapatan').textContent = formatRp(totalPendapatan);
+        document.getElementById('total-transaksi').textContent = dbData.records.length + ' Transaksi tercatat';
+        document.getElementById('sum-pokok').textContent = formatRp(totalPokok);
+        document.getElementById('sum-investasi').textContent = formatRp(totalInvestasi);
+        document.getElementById('sum-darurat').textContent = formatRp(totalDarurat);
+        document.getElementById('sum-bebas').textContent = formatRp(totalBebas);
+
+        renderHistory();
+        renderJSONViewer();
+    }
+
+    function renderHistory() {
+        const container = document.getElementById('history-container');
+        document.getElementById('history-count').textContent = dbData.records.length + ' item';
+
+        if (dbData.records.length === 0) {
+            container.innerHTML = '<div class="empty-state">Belum ada data pendapatan.<br>Tambahkan melalui tab Alokasi.</div>';
+            return;
+        }
+
+        container.innerHTML = dbData.records.map(item => `
+            <div class="history-item">
+                <div class="history-header">
+                    <div>
+                        <div class="history-title">${escapeHTML(item.nama)}</div>
+                        <div class="history-date">${escapeHTML(item.tanggal || '-')}</div>
+                    </div>
+                    <div class="history-right">
+                        <span class="history-total">${formatRp(item.pendapatan)}</span>
+                        <button class="btn-delete" onclick="deleteRecord(${item.id})" title="Hapus">×</button>
+                    </div>
+                </div>
+                <div class="history-breakdown">
+                    <div class="hb-item"><span>Pokok (50%):</span> <strong>${formatRp(item.alokasi.kebutuhan_pokok)}</strong></div>
+                    <div class="hb-item"><span>Investasi (30%):</span> <strong>${formatRp(item.alokasi.investasi)}</strong></div>
+                    <div class="hb-item"><span>Darurat (15%):</span> <strong>${formatRp(item.alokasi.dana_darurat)}</strong></div>
+                    <div class="hb-item"><span>Bebas (5%):</span> <strong>${formatRp(item.alokasi.uang_bebas)}</strong></div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function renderJSONViewer() {
+        const el = document.getElementById('json-preview');
+        if (el) {
+            el.textContent = JSON.stringify(dbData, null, 2);
+        }
+    }
+
+    // Export db.json
+    function exportJSON() {
+        const dataStr = JSON.stringify(dbData, null, 2);
+        const blob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'db.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast('db.json berhasil diunduh');
+    }
+
+    // Import db.json
+    function importJSON(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const parsed = JSON.parse(e.target.result);
+                if (parsed && Array.isArray(parsed.records)) {
+                    dbData = parsed;
+                    saveToLocal();
+                    renderAll();
+                    showToast('Database berhasil diimpor');
+                } else {
+                    showToast('Format db.json tidak sesuai');
+                }
+            } catch (err) {
+                showToast('File JSON tidak valid');
+            }
+            event.target.value = '';
+        };
+        reader.readAsText(file);
+    }
+
+    function resetToDefaultDB() {
+        localStorage.removeItem(STORAGE_KEY);
+        fetchServerDB(true);
+    }
+
+    function escapeHTML(str) {
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    initApp();
+</script>
+
+</body>
+</html>
