@@ -1,22 +1,32 @@
-
-  "app_name": "Alokasi Dana",
+{
+  "app_name": "Alokasi Dana & 7 Tangga Kekayaan",
   "rules": {
     "kebutuhan_pokok": 0.5,
     "investasi": 0.3,
     "dana_darurat": 0.15,
     "uang_bebas": 0.05
   },
+  "completed_steps": [],
   "records": [
     {
       "id": 1732291200000,
+      "tipe": "pemasukan",
       "nama": "Contoh Gaji Bulanan",
-      "pendapatan": 5000000,
+      "nominal": 10000000,
       "alokasi": {
-        "kebutuhan_pokok": 2500000,
-        "investasi": 1500000,
-        "dana_darurat": 750000,
-        "uang_bebas": 250000
+        "kebutuhan_pokok": 5000000,
+        "investasi": 3000000,
+        "dana_darurat": 1500000,
+        "uang_bebas": 500000
       },
+      "tanggal": "22 Nov 2026"
+    },
+    {
+      "id": 1732291260000,
+      "tipe": "pengeluaran",
+      "nama": "Bayar Kos & Makan Bulanan",
+      "pos": "kebutuhan_pokok",
+      "nominal": 2500000,
       "tanggal": "22 Nov 2026"
     }
   ]
