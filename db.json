@@ -1,0 +1,23 @@
+
+  "app_name": "Alokasi Dana",
+  "rules": {
+    "kebutuhan_pokok": 0.5,
+    "investasi": 0.3,
+    "dana_darurat": 0.15,
+    "uang_bebas": 0.05
+  },
+  "records": [
+    {
+      "id": 1732291200000,
+      "nama": "Contoh Gaji Bulanan",
+      "pendapatan": 5000000,
+      "alokasi": {
+        "kebutuhan_pokok": 2500000,
+        "investasi": 1500000,
+        "dana_darurat": 750000,
+        "uang_bebas": 250000
+      },
+      "tanggal": "22 Nov 2026"
+    }
+  ]
+}
