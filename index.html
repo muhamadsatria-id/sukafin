@@ -1,1562 +1,669 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#0f172a">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Alokasi Dana & 7 Tangga Kekayaan</title>
-    <style>
-        :root {
-            --bg-app: #f8fafc;
-            --bg-card: #ffffff;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --border-color: #e2e8f0;
-            --primary: #0f172a;
-            --primary-hover: #1e293b;
-            --accent-pokok: #2563eb;
-            --accent-investasi: #059669;
-            --accent-darurat: #d97706;
-            --accent-bebas: #7c3aed;
-            --danger: #dc2626;
-            --radius-lg: 16px;
-            --radius-md: 12px;
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            background-color: #e2e8f0;
-            color: var(--text-main);
-            display: flex;
-            justify-content: center;
-            min-height: 100vh;
-        }
-
-        .app-shell {
-            width: 100%;
-            max-width: 480px;
-            background-color: var(--bg-app);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 0 25px rgba(0,0,0,0.08);
-            position: relative;
-            padding-bottom: 84px;
-        }
-
-        /* Header */
-        header {
-            background-color: var(--bg-card);
-            padding: 16px 20px 14px;
-            border-bottom: 1px solid var(--border-color);
-            position: sticky;
-            top: 0;
-            z-index: 20;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .header-title h1 {
-            font-size: 17px;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-        }
-
-        .header-title p {
-            font-size: 11px;
-            color: var(--text-muted);
-            margin-top: 2px;
-        }
-
-        .btn-icon {
-            background: var(--bg-app);
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-            padding: 7px 10px;
-            border-radius: 10px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .btn-icon:active {
-            background: #e2e8f0;
-        }
-
-        /* Main Content */
-        main {
-            padding: 16px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .tab-panel {
-            display: none;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .tab-panel.active {
-            display: flex;
-        }
-
-        /* Summary & Status Card */
-        .summary-card {
-            background: var(--primary);
-            color: #ffffff;
-            border-radius: var(--radius-lg);
-            padding: 18px;
-        }
-
-        .summary-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 8px;
-        }
-
-        .summary-label {
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: #94a3b8;
-            font-weight: 600;
-        }
-
-        .level-pill {
-            background: rgba(255,255,255,0.14);
-            color: #38bdf8;
-            font-size: 11px;
-            font-weight: 700;
-            padding: 4px 9px;
-            border-radius: 999px;
-            white-space: nowrap;
-        }
-
-        .summary-amount {
-            font-size: 26px;
-            font-weight: 700;
-            margin-top: 6px;
-            letter-spacing: -0.02em;
-            font-variant-numeric: tabular-nums;
-        }
-
-        .progress-wrapper {
-            margin-top: 14px;
-        }
-
-        .progress-header {
-            display: flex;
-            justify-content: space-between;
-            font-size: 11px;
-            color: #cbd5e1;
-            margin-bottom: 6px;
-        }
-
-        .progress-track {
-            width: 100%;
-            height: 7px;
-            background: rgba(255,255,255,0.15);
-            border-radius: 999px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: #10b981;
-            border-radius: 999px;
-            transition: width 0.3s ease;
-        }
-
-        .summary-meta {
-            margin-top: 12px;
-            padding-top: 10px;
-            border-top: 1px solid rgba(255,255,255,0.12);
-            display: flex;
-            justify-content: space-between;
-            font-size: 11px;
-            color: #94a3b8;
-        }
-
-        /* Bucket Grid */
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .section-title {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--text-main);
-        }
-
-        .bucket-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-
-        .bucket-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            padding: 13px;
-            box-shadow: var(--shadow-sm);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .bucket-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 6px;
-        }
-
-        .bucket-name {
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-muted);
-        }
-
-        .bucket-badge {
-            font-size: 10px;
-            font-weight: 700;
-            padding: 2px 6px;
-            border-radius: 6px;
-        }
-
-        .badge-pokok { background: #dbeafe; color: var(--accent-pokok); }
-        .badge-investasi { background: #d1fae5; color: var(--accent-investasi); }
-        .badge-darurat { background: #fef3c7; color: var(--accent-darurat); }
-        .badge-bebas { background: #ede9fe; color: var(--accent-bebas); }
-
-        .bucket-value {
-            font-size: 15px;
-            font-weight: 700;
-            color: var(--text-main);
-            font-variant-numeric: tabular-nums;
-        }
-
-        .bucket-sub {
-            font-size: 10px;
-            color: var(--text-muted);
-            margin-top: 4px;
-            font-variant-numeric: tabular-nums;
-        }
-
-        /* Form Card & Mode Switcher */
-        .card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            padding: 16px;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .mode-switch {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            background: var(--bg-app);
-            padding: 4px;
-            border-radius: 10px;
-            border: 1px solid var(--border-color);
-            margin-bottom: 14px;
-        }
-
-        .mode-btn {
-            border: none;
-            background: transparent;
-            padding: 8px;
-            border-radius: 7px;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-muted);
-            cursor: pointer;
-            transition: all 0.15s;
-        }
-
-        .mode-btn.active-in {
-            background: var(--accent-investasi);
-            color: #ffffff;
-        }
-
-        .mode-btn.active-out {
-            background: var(--danger);
-            color: #ffffff;
-        }
-
-        .form-group {
-            margin-bottom: 12px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-muted);
-            margin-bottom: 6px;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 11px 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            font-size: 14px;
-            color: var(--text-main);
-            background: var(--bg-app);
-            outline: none;
-        }
-
-        .form-control:focus {
-            border-color: var(--primary);
-            background: #ffffff;
-        }
-
-        .preview-box {
-            background: var(--bg-app);
-            border: 1px dashed #cbd5e1;
-            border-radius: 10px;
-            padding: 12px;
-            margin-bottom: 14px;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            font-size: 12px;
-        }
-
-        .preview-row {
-            display: flex;
-            justify-content: space-between;
-            font-variant-numeric: tabular-nums;
-        }
-
-        .preview-row span:first-child { color: var(--text-muted); }
-        .preview-row span:last-child { font-weight: 600; }
-
-        .btn-primary {
-            width: 100%;
-            background: var(--primary);
-            color: #ffffff;
-            border: none;
-            padding: 13px;
-            border-radius: 12px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .btn-danger-submit {
-            background: var(--danger);
-        }
-
-        /* Tangga & Level Finansial (Otomatis) */
-        .level-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            padding: 14px;
-            margin-bottom: 10px;
-        }
-
-        .level-card.current-level {
-            border: 2px solid var(--accent-investasi);
-            background: #f0fdf4;
-        }
-
-        .level-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 6px;
-            gap: 8px;
-        }
-
-        .level-title {
-            font-size: 13px;
-            font-weight: 700;
-        }
-
-        .level-pct {
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--accent-investasi);
-            font-variant-numeric: tabular-nums;
-            white-space: nowrap;
-        }
-
-        .level-desc {
-            font-size: 12px;
-            color: var(--text-muted);
-            line-height: 1.45;
-            margin-bottom: 8px;
-        }
-
-        .level-bar {
-            width: 100%;
-            height: 6px;
-            background: #e2e8f0;
-            border-radius: 999px;
-            overflow: hidden;
-        }
-
-        .level-bar-fill {
-            height: 100%;
-            background: var(--accent-investasi);
-            border-radius: 999px;
-            transition: width 0.3s ease;
-        }
-
-        /* 7 Tangga Otomatis Cards */
-        .step-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            padding: 13px;
-            margin-bottom: 9px;
-        }
-
-        .step-card.achieved {
-            border-color: #a7f3d0;
-            background: #f0fdf4;
-        }
-
-        .step-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 4px;
-        }
-
-        .step-num {
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--accent-pokok);
-            text-transform: uppercase;
-        }
-
-        .step-card.achieved .step-num {
-            color: var(--accent-investasi);
-        }
-
-        .step-status-badge {
-            font-size: 10.5px;
-            font-weight: 700;
-            padding: 2px 8px;
-            border-radius: 999px;
-            font-variant-numeric: tabular-nums;
-        }
-
-        .status-done {
-            background: #d1fae5;
-            color: var(--accent-investasi);
-        }
-
-        .status-progress {
-            background: #e2e8f0;
-            color: var(--text-main);
-        }
-
-        .step-title {
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--text-main);
-        }
-
-        .step-desc {
-            font-size: 11.5px;
-            color: var(--text-muted);
-            margin-top: 3px;
-            line-height: 1.4;
-        }
-
-        .step-metric {
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--text-main);
-            margin-top: 7px;
-            margin-bottom: 5px;
-            display: flex;
-            justify-content: space-between;
-            font-variant-numeric: tabular-nums;
-        }
-
-        /* History List */
-        .filter-pills {
-            display: flex;
-            gap: 6px;
-            margin-bottom: 10px;
-        }
-
-        .pill-btn {
-            padding: 6px 12px;
-            border-radius: 999px;
-            border: 1px solid var(--border-color);
-            background: var(--bg-card);
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-muted);
-            cursor: pointer;
-        }
-
-        .pill-btn.active {
-            background: var(--primary);
-            color: #ffffff;
-            border-color: var(--primary);
-        }
-
-        .history-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .history-item {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            padding: 13px;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .history-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-        }
-
-        .history-title {
-            font-size: 14px;
-            font-weight: 700;
-        }
-
-        .history-meta {
-            font-size: 11px;
-            color: var(--text-muted);
-            margin-top: 3px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .history-right {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .amount-in {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--accent-investasi);
-            font-variant-numeric: tabular-nums;
-        }
-
-        .amount-out {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--danger);
-            font-variant-numeric: tabular-nums;
-        }
-
-        .btn-delete {
-            background: #fee2e2;
-            color: var(--danger);
-            border: none;
-            width: 26px;
-            height: 26px;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        .history-breakdown {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 5px;
-            margin-top: 10px;
-            padding-top: 9px;
-            border-top: 1px solid var(--border-color);
-            font-size: 11px;
-            font-variant-numeric: tabular-nums;
-        }
-
-        .hb-item {
-            display: flex;
-            justify-content: space-between;
-            color: var(--text-muted);
-        }
-
-        .hb-item strong { color: var(--text-main); }
-
-        .empty-state {
-            text-align: center;
-            padding: 32px 20px;
-            color: var(--text-muted);
-            font-size: 13px;
-            background: var(--bg-card);
-            border-radius: var(--radius-md);
-            border: 1px dashed var(--border-color);
-        }
-
-        /* JSON DB Management */
-        .db-info {
-            font-size: 12px;
-            color: var(--text-muted);
-            line-height: 1.5;
-            margin-bottom: 12px;
-        }
-
-        .btn-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-
-        .btn-outline {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-            padding: 11px;
-            border-radius: 10px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            text-align: center;
-        }
-
-        pre.json-viewer {
-            background: #0f172a;
-            color: #e2e8f0;
-            padding: 12px;
-            border-radius: 10px;
-            font-size: 11px;
-            overflow-x: auto;
-            max-height: 240px;
-            margin-top: 12px;
-            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-        }
-
-        /* Bottom Navigation */
-        nav.bottom-nav {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            max-width: 480px;
-            background: var(--bg-card);
-            border-top: 1px solid var(--border-color);
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
-            z-index: 30;
-        }
-
-        .nav-item {
-            background: none;
-            border: none;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 3px;
-            font-size: 10.5px;
-            font-weight: 600;
-            color: var(--text-muted);
-            cursor: pointer;
-            padding: 4px 0;
-        }
-
-        .nav-item.active {
-            color: var(--primary);
-        }
-
-        .nav-icon {
-            font-size: 17px;
-            line-height: 1;
-        }
-
-        /* Toast */
-        .toast {
-            position: fixed;
-            top: 68px;
-            left: 50%;
-            transform: translateX(-50%) translateY(-10px);
-            background: #0f172a;
-            color: #ffffff;
-            padding: 9px 16px;
-            border-radius: 999px;
-            font-size: 12px;
-            font-weight: 600;
-            opacity: 0;
-            pointer-events: none;
-            transition: all 0.2s ease;
-            z-index: 50;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-
-        .toast.show {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0D7A67">
+  <title>SUKAFIN Beranda</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">/** @type {import('tailwindcss').Config} */
+globalThis.tailwind = globalThis.tailwind || {};
+globalThis.tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        'hero-teal': '#0D7A67', 'hero-amber': '#DEA02B',
+        'pos-pokok-bg': '#E7F3EE', 'pos-pokok-fg': '#005143',
+        'pos-invest-bg': '#FFEEDA', 'pos-invest-fg': '#7F5700',
+        'pos-darurat-bg': '#FFEDE9', 'pos-darurat-fg': '#85402E',
+        'pos-bebas-bg': '#EEF2EE', 'pos-bebas-fg': '#28332F',
+        'byond-teal': '#0D7A6E', 'byond-gold': '#D4A738',
+        'byond-amber-text': '#9A6700', 'byond-qris': '#E6A117',
+        'byond-nav-teal': '#00877A', 'byond-nav-inactive': '#5B5F5D',
+        'light-primary': '#005F50', 'light-on-primary': '#FFFFFF',
+        'light-primary-container': '#0D7A67', 'light-on-primary-container': '#AAFFE8',
+        'light-secondary': '#7F5700', 'light-on-secondary': '#FFFFFF',
+        'light-secondary-container': '#FDBA45', 'light-on-secondary-container': '#6F4B00',
+        'light-tertiary': '#85402E', 'light-on-tertiary': '#FFFFFF',
+        'light-tertiary-container': '#A35744', 'light-on-tertiary-container': '#FFEAE6',
+        'light-error': '#BA1A1A', 'light-on-error': '#FFFFFF',
+        'light-error-container': '#FFDAD6', 'light-on-error-container': '#93000A',
+        'light-background': '#F6FAF7', 'light-on-background': '#181D1B',
+        'light-surface': '#F6FAF7', 'light-surface-dim': '#D7DBD8',
+        'light-surface-bright': '#F6FAF7', 'light-surface-container-lowest': '#FFFFFF',
+        'light-surface-container-low': '#F1F5F1', 'light-surface-container': '#EBEFEC',
+        'light-surface-container-high': '#E5E9E6', 'light-surface-container-highest': '#DFE3E0',
+        'light-on-surface': '#181D1B', 'light-surface-variant': '#D9E5E0',
+        'light-on-surface-variant': '#3E4945', 'light-outline': '#6E7A75',
+        'light-outline-variant': '#BDC9C4', 'light-inverse-surface': '#2D3130',
+        'light-inverse-on-surface': '#EEF2EE', 'light-inverse-primary': '#7CD7C0',
+        'dark-primary': '#7CD7C0', 'dark-on-primary': '#00382E',
+        'dark-primary-container': '#0D7A67', 'dark-on-primary-container': '#AAFFE8',
+        'dark-secondary': '#FDBA45', 'dark-on-secondary': '#432C00',
+        'dark-surface': '#101413', 'dark-on-surface': '#DFE3E0',
+      },
+      borderRadius: { 'sm':'6px','DEFAULT':'10px','md':'12px','lg':'16px','xl':'20px','full':'9999px' },
+      spacing: {
+        'gutter-xs':'4px','gutter-sm':'8px','gutter-12':'12px','gutter-md':'16px',
+        'gutter-lg':'20px','gutter-xl':'24px','section':'32px','page-margin':'16px',
+      },
+      fontFamily: {
+        'display':['"Red Hat Text"','sans-serif'],'headline':['"Red Hat Text"','sans-serif'],
+        'title':['"Red Hat Text"','sans-serif'],'body':['"Instrument Sans"','sans-serif'],
+        'label':['"Instrument Sans"','sans-serif'],'mono':['"Source Code Pro"','monospace'],
+      },
+      fontSize: {
+        'display-lg':['36px',{lineHeight:'44px',letterSpacing:'-0.5px',fontWeight:'700'}],
+        'headline-lg':['22px',{lineHeight:'28px',letterSpacing:'-0.25px',fontWeight:'700'}],
+        'headline-md':['18px',{lineHeight:'24px',letterSpacing:'-0.15px',fontWeight:'700'}],
+        'title-md':['15px',{lineHeight:'20px',letterSpacing:'0px',fontWeight:'600'}],
+        'body-md':['14px',{lineHeight:'20px',letterSpacing:'0px',fontWeight:'400'}],
+        'body-sm':['12px',{lineHeight:'16px',letterSpacing:'0px',fontWeight:'400'}],
+        'label-lg':['14px',{lineHeight:'20px',letterSpacing:'0.1px',fontWeight:'600'}],
+        'label-md':['12px',{lineHeight:'16px',letterSpacing:'0.2px',fontWeight:'600'}],
+        'label-sm':['11px',{lineHeight:'14px',letterSpacing:'0.2px',fontWeight:'600'}],
+      },
+    },
+  },
+};
+if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
+</script>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Red+Hat+Text:wght@500;600;700&family=Source+Code+Pro:wght@500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" rel="stylesheet">
+  <style>
+    .material-symbols-outlined { display:inline-block;width:1em;height:1em;line-height:1!important;box-sizing:content-box;overflow:hidden;white-space:nowrap;direction:ltr;vertical-align:middle; }
+    .no-scrollbar::-webkit-scrollbar { display:none; }
+    .no-scrollbar { -ms-overflow-style:none; scrollbar-width:none; }
+    [hidden] { display:none !important; }
+  </style>
 </head>
-<body>
+<body class="bg-light-surface-container-lowest text-light-on-surface font-body antialiased">
 
-<div class="app-shell">
-    <header>
-        <div class="header-title">
-            <h1>Alokasi & Tangga Kekayaan</h1>
-            <p>50% Pokok • 30% Invest • 15% Darurat • 5% Bebas</p>
+  <!-- LOGIN -->
+  <div id="login-overlay" class="fixed inset-0 z-50 flex items-center justify-center bg-light-primary p-gutter-lg">
+    <form id="login-form" class="w-full max-w-sm rounded-xl bg-light-surface-container-lowest p-gutter-xl shadow-[0_16px_48px_-8px_rgba(0,40,32,0.35)]">
+      <div class="mb-gutter-md flex items-center gap-gutter-sm">
+        <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-light-primary text-light-on-primary font-headline font-bold">S</div>
+        <div>
+          <p class="font-headline text-headline-md leading-tight">SUKAFIN</p>
+          <p class="font-label text-label-sm text-light-on-surface-variant">by muhamadsatria</p>
         </div>
-        <button class="btn-icon" onclick="exportJSON()" title="Download db.json">
-            ↓ db.json
-        </button>
-    </header>
+      </div>
+      <p class="mb-gutter-lg font-body text-body-md text-light-on-surface-variant">Masuk untuk mengelola alokasi dana dan kekayaanmu.</p>
+      <label class="mb-gutter-xs block font-label text-label-md" for="login-username">Username</label>
+      <input id="login-username" class="mb-gutter-md w-full rounded-lg border border-light-outline-variant bg-light-surface-container-lowest px-gutter-12 py-3 font-body text-body-md outline-none focus:border-light-primary" autocomplete="username" required>
+      <label class="mb-gutter-xs block font-label text-label-md" for="login-password">Password</label>
+      <input id="login-password" type="password" class="mb-gutter-md w-full rounded-lg border border-light-outline-variant bg-light-surface-container-lowest px-gutter-12 py-3 font-body text-body-md outline-none focus:border-light-primary" autocomplete="current-password" required>
+      <p id="login-error" class="mb-gutter-sm min-h-4 font-body text-body-sm text-light-error" role="alert"></p>
+      <button type="submit" class="w-full rounded-lg bg-light-primary py-3 font-label text-label-lg text-light-on-primary">Masuk</button>
+      <p class="mt-gutter-md text-center font-body text-body-sm text-light-on-surface-variant">Superadmin: <strong>superadmin</strong> / <strong>superadmin123</strong></p>
+    </form>
+  </div>
 
-    <div id="toast" class="toast">Tersimpan</div>
+  <div id="app" class="min-h-[100dvh] w-full max-w-md mx-auto bg-light-surface-container-lowest relative flex flex-col" hidden>
 
-    <main>
-        <!-- TAB 1: BERANDA (SALDO & TRANSAKSI) -->
-        <section id="tab-home" class="tab-panel active">
-            <div class="summary-card">
-                <div class="summary-top">
-                    <div>
-                        <div class="summary-label">Total Saldo Bersih Saat Ini</div>
-                        <div class="summary-amount" id="total-saldo">Rp 0</div>
-                    </div>
-                    <span class="level-pill" id="badge-current-level">Level 1</span>
-                </div>
+    <!-- HEADER -->
+    <div class="relative bg-gradient-to-b from-byond-teal via-byond-teal to-light-surface-container-lowest pb-gutter-md">
+      <div class="pointer-events-none absolute inset-x-0 top-24 bottom-0 bg-gradient-to-b from-transparent via-byond-gold/75 to-light-surface-container-lowest" aria-hidden="true"></div>
 
-                <div class="progress-wrapper">
-                    <div class="progress-header">
-                        <span id="summary-step-label">7 Tangga Kekayaan: 0/7 (0%)</span>
-                        <span id="summary-next-target">Menuju Lv 2: 0%</span>
-                    </div>
-                    <div class="progress-track">
-                        <div class="progress-fill" id="summary-step-bar" style="width: 0%;"></div>
-                    </div>
-                </div>
+      <header class="relative z-10 flex items-center justify-between px-page-margin pt-[max(12px,env(safe-area-inset-top))] pb-gutter-sm">
+        <div class="flex items-center gap-gutter-sm">
+          <!-- <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true" class="shrink-0">
+            <path d="M4 4H15.5C19.5 4 22 6.2 22 9.4C22 11.4 20.8 13 18.8 13.8C21.3 14.5 23 16.5 23 19.1C23 22.7 20.1 25 15.8 25H4V4Z" fill="white"></path>
+          </svg> -->
+          <div class="flex flex-col leading-none">
+            <span class="font-headline text-headline-md tracking-tight text-light-on-primary">SUKAFIN</span>
+            <span class="font-label text-label-sm text-light-on-primary/80">by muhamadsatria</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-gutter-md text-light-on-primary">
+          <button id="btn-backup" type="button" aria-label="Unduh backup SQLite" onclick="downloadBackup()" class="inline-flex items-center justify-center">
+            <span class="material-symbols-outlined text-[22px]">database</span>
+          </button>
+          <button type="button" aria-label="Keluar" onclick="doLogout()" class="inline-flex items-center justify-center">
+            <span class="material-symbols-outlined text-[24px]">logout</span>
+          </button>
+        </div>
+      </header>
 
-                <div class="summary-meta">
-                    <span id="meta-pemasukan">Masuk: Rp 0</span>
-                    <span id="meta-pengeluaran">Keluar: Rp 0</span>
-                </div>
+      <div class="relative z-10 flex items-center gap-gutter-12 px-page-margin pt-gutter-sm pb-gutter-md">
+        <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-light-on-primary/50 bg-light-primary text-light-on-primary font-title text-title-md" id="user-avatar">S</span>
+        <div class="min-w-0">
+          <span id="greeting-name" class="block truncate font-title text-title-md text-light-on-primary">Superadmin</span>
+          <span id="greeting-role" class="font-label text-label-sm text-light-on-primary/80">superadmin</span>
+        </div>
+      </div>
+
+      <section aria-label="Informasi Saldo" class="relative z-10 px-page-margin">
+        <article class="relative overflow-hidden rounded-xl border border-light-outline-variant/25 bg-light-surface-container-lowest p-gutter-lg shadow-[0_8px_28px_-4px_rgba(0,32,26,0.12)]">
+          <div class="pointer-events-none absolute -right-8 -top-8 h-28 w-36 rounded-full bg-gradient-to-br from-byond-gold/25 via-byond-teal/15 to-transparent" aria-hidden="true"></div>
+          <div class="relative z-10 flex flex-col gap-gutter-xs">
+            <div class="flex items-center gap-gutter-xs">
+              <h2 class="font-title text-title-md">Saldo Bersih Saat Ini</h2>
+              <span class="material-symbols-outlined text-[18px]" aria-hidden="true">chevron_right</span>
             </div>
+            <p id="summary-progress" class="font-body text-body-md text-light-on-surface-variant">7 Tangga: 0/7 (0%)</p>
+          </div>
+          <div class="relative z-10 flex items-center gap-gutter-md pt-gutter-xs">
+            <p id="saldo-text" class="font-headline text-headline-lg tabular-nums tracking-wider">Rp ••••••••</p>
+            <button type="button" aria-label="Tampilkan saldo" onclick="toggleSaldo()" class="inline-flex items-center justify-center">
+              <span id="saldo-eye" class="material-symbols-outlined text-[22px]">visibility_off</span>
+            </button>
+          </div>
+          <div class="relative z-10 mt-gutter-md h-1.5 overflow-hidden rounded-full bg-light-surface-container-high">
+            <div id="summary-bar" class="h-full rounded-full bg-light-primary" style="width:0%"></div>
+          </div>
+        </article>
+      </section>
+    </div>
 
-            <div>
-                <div class="section-header">
-                    <span class="section-title">Sisa Saldo Tiap Pos</span>
-                </div>
-                <div class="bucket-grid">
-                    <div class="bucket-card">
-                        <div class="bucket-top">
-                            <span class="bucket-name">Kebutuhan Pokok</span>
-                            <span class="bucket-badge badge-pokok">50%</span>
-                        </div>
-                        <div class="bucket-value" id="bal-pokok">Rp 0</div>
-                        <div class="bucket-sub" id="sub-pokok">Terpakai: Rp 0</div>
-                    </div>
-                    <div class="bucket-card">
-                        <div class="bucket-top">
-                            <span class="bucket-name">Butir Investasi</span>
-                            <span class="bucket-badge badge-investasi">30%</span>
-                        </div>
-                        <div class="bucket-value" id="bal-investasi">Rp 0</div>
-                        <div class="bucket-sub" id="sub-investasi">Terpakai: Rp 0</div>
-                    </div>
-                    <div class="bucket-card">
-                        <div class="bucket-top">
-                            <span class="bucket-name">Dana Darurat</span>
-                            <span class="bucket-badge badge-darurat">15%</span>
-                        </div>
-                        <div class="bucket-value" id="bal-darurat">Rp 0</div>
-                        <div class="bucket-sub" id="sub-darurat">Terpakai: Rp 0</div>
-                    </div>
-                    <div class="bucket-card">
-                        <div class="bucket-top">
-                            <span class="bucket-name">Uang Bebas</span>
-                            <span class="bucket-badge badge-bebas">5%</span>
-                        </div>
-                        <div class="bucket-value" id="bal-bebas">Rp 0</div>
-                        <div class="bucket-sub" id="sub-bebas">Terpakai: Rp 0</div>
-                    </div>
-                </div>
+    <main class="flex-1 flex flex-col gap-gutter-xl px-page-margin pb-32 pt-gutter-sm">
+
+      <!-- BERANDA -->
+      <section id="tab-beranda" class="tab-panel flex flex-col gap-gutter-xl">
+        <section aria-labelledby="heading-pos">
+          <div class="mb-gutter-12 flex items-center justify-between">
+            <h2 id="heading-pos" class="font-headline text-headline-md">Saldo Tabungan</h2>
+            <span class="font-label text-label-sm text-light-on-surface-variant">Alokasi otomatis</span>
+          </div>
+          <div class="no-scrollbar flex items-stretch gap-gutter-12 overflow-x-auto pb-gutter-xs" id="pos-cards">
+            <div class="w-40 shrink-0 rounded-lg border border-light-outline-variant/30 bg-pos-pokok-bg p-gutter-12">
+              <div class="mb-gutter-sm flex items-center gap-gutter-sm"><span class="flex h-7 w-7 items-center justify-center rounded-full bg-pos-pokok-fg font-label text-label-sm text-white">PK</span><span class="font-title text-title-md text-pos-pokok-fg">Pokok</span></div>
+              <p id="bal-pokok" class="font-label text-label-lg text-pos-pokok-fg">Rp 0</p>
             </div>
-
-            <!-- Form Pemasukan / Pengeluaran -->
-            <div class="card">
-                <div class="mode-switch">
-                    <button type="button" id="btn-mode-in" class="mode-btn active-in" onclick="setTxMode('pemasukan')">+ Pemasukan</button>
-                    <button type="button" id="btn-mode-out" class="mode-btn" onclick="setTxMode('pengeluaran')">- Pengeluaran</button>
-                </div>
-
-                <form id="tx-form" onsubmit="handleTxSubmit(event)">
-                    <div class="form-group">
-                        <label for="input-nama" id="label-nama">Sumber Pemasukan</label>
-                        <input type="text" id="input-nama" class="form-control" placeholder="Contoh: Gaji Bulanan, Freelance" required>
-                    </div>
-
-                    <div class="form-group" id="group-pos" style="display: none;">
-                        <label for="input-pos">Ambil dari Pos Alokasi</label>
-                        <select id="input-pos" class="form-control" onchange="updateExpensePreview()">
-                            <option value="kebutuhan_pokok">Kebutuhan Pokok (50%)</option>
-                            <option value="investasi">Butir Investasi (30%)</option>
-                            <option value="dana_darurat">Butir Dana Darurat (15%)</option>
-                            <option value="uang_bebas">Butir Uang Bebas (5%)</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="input-nominal">Nominal (Rp)</label>
-                        <input type="text" id="input-nominal" class="form-control" inputmode="numeric" placeholder="0" oninput="handleNominalInput(this)" required>
-                    </div>
-
-                    <!-- Preview Pemasukan -->
-                    <div class="preview-box" id="preview-income">
-                        <div class="preview-row"><span>Kebutuhan Pokok (50%)</span><span id="prev-pokok">Rp 0</span></div>
-                        <div class="preview-row"><span>Butir Investasi (30%)</span><span id="prev-investasi">Rp 0</span></div>
-                        <div class="preview-row"><span>Butir Dana Darurat (15%)</span><span id="prev-darurat">Rp 0</span></div>
-                        <div class="preview-row"><span>Butir Uang Bebas (5%)</span><span id="prev-bebas">Rp 0</span></div>
-                    </div>
-
-                    <!-- Preview Pengeluaran -->
-                    <div class="preview-box" id="preview-expense" style="display: none;">
-                        <div class="preview-row"><span>Sisa Saldo Pos Terpilih</span><span id="prev-pos-before">Rp 0</span></div>
-                        <div class="preview-row"><span>Sisa Setelah Pengeluaran</span><span id="prev-pos-after">Rp 0</span></div>
-                    </div>
-
-                    <button type="submit" id="btn-submit-tx" class="btn-primary">+ Simpan & Alokasikan</button>
-                </form>
+            <div class="w-40 shrink-0 rounded-lg border border-light-outline-variant/30 bg-pos-invest-bg p-gutter-12">
+              <div class="mb-gutter-sm flex items-center gap-gutter-sm"><span class="flex h-7 w-7 items-center justify-center rounded-full bg-pos-invest-fg font-label text-label-sm text-white">IN</span><span class="font-title text-title-md text-pos-invest-fg">Investasi</span></div>
+              <p id="bal-investasi" class="font-label text-label-lg text-pos-invest-fg">Rp 0</p>
             </div>
+            <div class="w-40 shrink-0 rounded-lg border border-light-outline-variant/30 bg-pos-darurat-bg p-gutter-12">
+              <div class="mb-gutter-sm flex items-center gap-gutter-sm"><span class="flex h-7 w-7 items-center justify-center rounded-full bg-pos-darurat-fg font-label text-label-sm text-white">DD</span><span class="font-title text-title-md text-pos-darurat-fg">Darurat</span></div>
+              <p id="bal-darurat" class="font-label text-label-lg text-pos-darurat-fg">Rp 0</p>
+            </div>
+            <div class="w-40 shrink-0 rounded-lg border border-light-outline-variant/30 bg-pos-bebas-bg p-gutter-12">
+              <div class="mb-gutter-sm flex items-center gap-gutter-sm"><span class="flex h-7 w-7 items-center justify-center rounded-full bg-pos-bebas-fg font-label text-label-sm text-white">UB</span><span class="font-title text-title-md text-pos-bebas-fg">Bebas</span></div>
+              <p id="bal-bebas" class="font-label text-label-lg text-pos-bebas-fg">Rp 0</p>
+            </div>
+          </div>
         </section>
 
-        <!-- TAB 2: TANGGA & LEVEL FINANSIAL (100% OTOMATIS) -->
-        <section id="tab-ladder" class="tab-panel">
-            <div class="summary-card">
-                <div class="summary-label">Posisi Otomatis Kamu Saat Ini</div>
-                <div class="summary-amount" style="font-size: 20px;" id="ladder-status-title">Level 1: Survival</div>
-                <p style="font-size: 12px; color: #cbd5e1; margin-top: 6px; line-height: 1.45;" id="ladder-status-desc">
-                    Fokus disiplin mencatat anggaran, lunasi utang konsumtif, dan kumpulkan modal awal Rp10 juta.
-                </p>
-                <div class="summary-meta">
-                    <span id="ladder-aset-aktif">Aset Darurat + Invest: Rp 0</span>
-                    <span id="ladder-step-pct">7 Tangga: 0%</span>
-                </div>
-            </div>
-
-            <!-- 7 Tangga Kekayaan Otomatis -->
-            <div>
-                <div class="section-header">
-                    <span class="section-title">7 Tangga Kekayaan (Otomatis)</span>
-                    <span style="font-size: 12px; font-weight: 700; color: var(--accent-investasi);" id="steps-progress-text">0 / 7 (0%)</span>
-                </div>
-                <div id="seven-steps-container"></div>
-            </div>
-
-            <!-- 5 Level Kebebasan Finansial -->
-            <div>
-                <div class="section-header">
-                    <span class="section-title">5 Level Kebebasan Finansial</span>
-                    <span style="font-size: 11px; color: var(--text-muted);">Persentase Target</span>
-                </div>
-                <div id="five-levels-container"></div>
-            </div>
+        <section aria-labelledby="heading-riwayat">
+          <div class="mb-gutter-md flex items-center justify-between">
+            <h2 id="heading-riwayat" class="font-headline text-headline-md">Riwayat</h2>
+            <span id="history-count" class="font-label text-label-sm text-light-on-surface-variant">0 transaksi</span>
+          </div>
+          <div class="mb-gutter-md flex gap-gutter-sm">
+            <button type="button" onclick="setFilter('all', this)" class="filter-btn rounded-full bg-light-primary px-3 py-1.5 font-label text-label-sm text-light-on-primary">Semua</button>
+            <button type="button" onclick="setFilter('pemasukan', this)" class="filter-btn rounded-full bg-light-surface-container px-3 py-1.5 font-label text-label-sm">Masuk</button>
+            <button type="button" onclick="setFilter('pengeluaran', this)" class="filter-btn rounded-full bg-light-surface-container px-3 py-1.5 font-label text-label-sm">Keluar</button>
+          </div>
+          <ul id="history-list" class="flex flex-col gap-gutter-md"></ul>
         </section>
+      </section>
 
-        <!-- TAB 3: RIWAYAT TRANSAKSI -->
-        <section id="tab-history" class="tab-panel">
-            <div class="section-header">
-                <span class="section-title">Riwayat Mutasi</span>
-                <span style="font-size: 12px; color: var(--text-muted);" id="history-count">0 transaksi</span>
-            </div>
+      <!-- DOMPET -->
+      <section id="tab-dompet" class="tab-panel hidden flex-col gap-gutter-xl">
+        <div>
+          <h2 class="font-headline text-headline-md">Dompet & Alokasi</h2>
+          <p class="mt-gutter-xs font-body text-body-md text-light-on-surface-variant">Ringkasan pos dan arus kas pribadimu.</p>
+        </div>
+        <div class="grid grid-cols-2 gap-gutter-12" id="wallet-grid"></div>
+        <div class="rounded-lg border border-light-outline-variant/30 bg-light-surface-container-low p-gutter-lg">
+          <div class="flex justify-between font-body text-body-md"><span>Total Pemasukan</span><span id="meta-masuk" class="font-label text-label-lg">Rp 0</span></div>
+          <div class="mt-gutter-sm flex justify-between font-body text-body-md"><span>Total Pengeluaran</span><span id="meta-keluar" class="font-label text-label-lg">Rp 0</span></div>
+          <div class="mt-gutter-sm flex justify-between border-t border-light-outline-variant/40 pt-gutter-sm font-title text-title-md"><span>Saldo Bersih</span><span id="meta-bersih">Rp 0</span></div>
+        </div>
+      </section>
 
-            <div class="filter-pills">
-                <button class="pill-btn active" onclick="setHistoryFilter('all', this)">Semua</button>
-                <button class="pill-btn" onclick="setHistoryFilter('pemasukan', this)">Pemasukan</button>
-                <button class="pill-btn" onclick="setHistoryFilter('pengeluaran', this)">Pengeluaran</button>
-            </div>
+      <!-- IN / OUTFLOW -->
+      <section id="tab-inout" class="tab-panel hidden flex-col gap-gutter-lg">
+        <div>
+          <h2 class="font-headline text-headline-md">Catat Transaksi</h2>
+          <p class="mt-gutter-xs font-body text-body-md text-light-on-surface-variant">Pemasukan dibagi otomatis 50/30/15/5.</p>
+        </div>
+        <div class="grid grid-cols-2 gap-gutter-sm rounded-lg bg-light-surface-container p-1">
+          <button type="button" id="mode-in" onclick="setMode('pemasukan')" class="rounded-md bg-light-primary py-2.5 font-label text-label-lg text-light-on-primary">+ Pemasukan</button>
+          <button type="button" id="mode-out" onclick="setMode('pengeluaran')" class="rounded-md py-2.5 font-label text-label-lg text-light-on-surface-variant">- Pengeluaran</button>
+        </div>
+        <form id="tx-form" class="flex flex-col gap-gutter-md rounded-lg border border-light-outline-variant/30 bg-white p-gutter-lg">
+          <div>
+            <label class="mb-gutter-xs block font-label text-label-md" for="tx-nama" id="tx-label">Sumber Pemasukan</label>
+            <input id="tx-nama" class="w-full rounded-lg border border-light-outline-variant px-gutter-12 py-3 font-body text-body-md outline-none focus:border-light-primary" placeholder="Contoh: Gaji Bulanan" required>
+          </div>
+          <div id="group-pos" hidden>
+            <label class="mb-gutter-xs block font-label text-label-md" for="tx-pos">Ambil dari Pos</label>
+            <select id="tx-pos" class="w-full rounded-lg border border-light-outline-variant px-gutter-12 py-3 font-body text-body-md outline-none focus:border-light-primary">
+              <option value="kebutuhan_pokok">Kebutuhan Pokok (50%)</option>
+              <option value="investasi">Investasi (30%)</option>
+              <option value="dana_darurat">Dana Darurat (15%)</option>
+              <option value="uang_bebas">Uang Bebas (5%)</option>
+            </select>
+          </div>
+          <div>
+            <label class="mb-gutter-xs block font-label text-label-md" for="tx-nominal">Nominal (Rp)</label>
+            <input id="tx-nominal" inputmode="numeric" class="w-full rounded-lg border border-light-outline-variant px-gutter-12 py-3 font-body text-body-md outline-none focus:border-light-primary" placeholder="0" oninput="formatNominal(this)" required>
+          </div>
+          <div id="preview-box" class="rounded-lg bg-light-surface-container p-gutter-12">
+            <div class="flex justify-between font-body text-body-sm"><span>Kebutuhan Pokok</span><span id="prev-pokok">Rp 0</span></div>
+            <div class="mt-1 flex justify-between font-body text-body-sm"><span>Investasi</span><span id="prev-investasi">Rp 0</span></div>
+            <div class="mt-1 flex justify-between font-body text-body-sm"><span>Dana Darurat</span><span id="prev-darurat">Rp 0</span></div>
+            <div class="mt-1 flex justify-between font-body text-body-sm"><span>Uang Bebas</span><span id="prev-bebas">Rp 0</span></div>
+          </div>
+          <button id="tx-submit" type="submit" class="rounded-lg bg-light-primary py-3 font-label text-label-lg text-light-on-primary">+ Simpan & Alokasikan</button>
+        </form>
+      </section>
 
-            <div id="history-container" class="history-list"></div>
-        </section>
+      <!-- LEVEL -->
+      <section id="tab-level" class="tab-panel hidden flex-col gap-gutter-xl">
+        <div class="rounded-xl bg-gradient-to-br from-byond-teal to-light-primary p-gutter-lg text-light-on-primary">
+          <p class="font-label text-label-md opacity-80">Posisi Otomatis Kamu</p>
+          <h2 id="level-title" class="mt-gutter-xs font-headline text-headline-md">Level 1: Survival</h2>
+          <p id="level-desc" class="mt-gutter-sm font-body text-body-md opacity-90">Fokus catat anggaran, jaga arus kas positif, dan kumpulkan modal awal Rp10 juta.</p>
+        </div>
+        <div>
+          <div class="mb-gutter-12 flex items-center justify-between">
+            <h2 class="font-headline text-headline-md">7 Tangga Kekayaan</h2>
+            <span id="steps-progress" class="font-label text-label-md text-byond-amber-text">0 / 7 (0%)</span>
+          </div>
+          <div id="steps-container" class="flex flex-col gap-gutter-12"></div>
+        </div>
+      </section>
 
-        <!-- TAB 4: DATABASE JSON -->
-        <section id="tab-database" class="tab-panel">
-            <div class="card">
-                <div class="section-header">
-                    <span class="section-title">Manajemen Database (db.json)</span>
-                </div>
-                <p class="db-info">
-                    Data disimpan otomatis di browser (LocalStorage) dan dapat diekspor atau diimpor melalui file <strong>db.json</strong> untuk backup maupun sinkronisasi hosting statis Vercel.
-                </p>
-                <div class="btn-grid">
-                    <button class="btn-outline" onclick="exportJSON()">Download db.json</button>
-                    <label class="btn-outline" style="cursor: pointer;">
-                        Import db.json
-                        <input type="file" id="import-file" accept=".json" style="display: none;" onchange="importJSON(event)">
-                    </label>
-                </div>
-
-                <pre class="json-viewer" id="json-preview"></pre>
-            </div>
-        </section>
+      <!-- MANAGE USER -->
+      <section id="tab-user" class="tab-panel hidden flex-col gap-gutter-xl">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="font-headline text-headline-md">Manage User</h2>
+            <p class="mt-gutter-xs font-body text-body-md text-light-on-surface-variant">Data setiap akun tersimpan terpisah di server.</p>
+          </div>
+          <span class="rounded-full bg-light-secondary-container px-3 py-1 font-label text-label-sm text-light-on-secondary-container">Superadmin</span>
+        </div>
+        <form id="user-form" class="flex flex-col gap-gutter-sm rounded-lg border border-light-outline-variant/30 bg-white p-gutter-lg">
+          <label class="font-label text-label-md" for="new-username">Username baru</label>
+          <input id="new-username" class="rounded-lg border border-light-outline-variant px-gutter-12 py-3 font-body text-body-md outline-none focus:border-light-primary" required>
+          <label class="font-label text-label-md" for="new-password">Password</label>
+          <input id="new-password" type="password" class="rounded-lg border border-light-outline-variant px-gutter-12 py-3 font-body text-body-md outline-none focus:border-light-primary" required>
+          <button type="submit" class="mt-gutter-sm rounded-lg bg-light-primary py-3 font-label text-label-lg text-light-on-primary">+ Tambah User</button>
+        </form>
+        <div id="users-list" class="flex flex-col gap-gutter-12"></div>
+        <!-- <div class="rounded-lg bg-light-surface-container p-gutter-lg">
+          <p id="db-meta" class="font-mono text-body-sm text-light-on-surface-variant">Memuat info database…</p>
+          <button type="button" onclick="downloadBackup()" class="mt-gutter-sm font-label text-label-lg text-byond-amber-text">Unduh backup SQLite →</button>
+        </div> -->
+      </section>
     </main>
 
-    <nav class="bottom-nav">
-        <button class="nav-item active" onclick="switchTab('home', this)">
-            <span class="nav-icon">◉</span>
-            <span>Dompet</span>
-        </button>
-        <button class="nav-item" onclick="switchTab('ladder', this)">
-            <span class="nav-icon">▲</span>
-            <span>7 Tangga</span>
-        </button>
-        <button class="nav-item" onclick="switchTab('history', this)">
-            <span class="nav-icon">☰</span>
-            <span>Riwayat</span>
-        </button>
-        <button class="nav-item" onclick="switchTab('database', this)">
-            <span class="nav-icon">{ }</span>
-            <span>Database</span>
-        </button>
+    <!-- BOTTOM NAV -->
+    <nav aria-label="Navigasi utama" class="fixed bottom-0 left-0 right-0 z-30 mx-auto max-w-md border-t border-light-outline-variant/40 bg-light-surface-container-lowest shadow-[0_-4px_20px_-4px_rgba(0,32,26,0.08)]">
+      <ul class="grid grid-cols-5 items-end pb-gutter-sm">
+        <li><button type="button" data-nav="beranda" onclick="switchTab('beranda')" class="nav-btn flex w-full flex-col items-center gap-gutter-xs pt-gutter-sm text-light-primary"><span class="material-symbols-outlined text-[24px]">home</span><span class="font-label text-label-sm">Beranda</span></button></li>
+        <li><button type="button" data-nav="dompet" onclick="switchTab('dompet')" class="nav-btn flex w-full flex-col items-center gap-gutter-xs pt-gutter-sm text-byond-nav-inactive"><span class="material-symbols-outlined text-[24px]">account_balance_wallet</span><span class="font-label text-label-sm">Dompet</span></button></li>
+        <li><button type="button" data-nav="inout" onclick="switchTab('inout')" class="nav-btn flex w-full flex-col items-center gap-gutter-xs -mt-6 text-byond-nav-inactive"><span class="flex h-14 w-14 items-center justify-center rounded-full border-4 border-light-surface-container-lowest bg-byond-qris text-light-on-primary shadow-[0_6px_16px_rgba(230,161,23,0.40)]"><span class="material-symbols-outlined text-[26px]">qr_code_scanner</span></span><span class="font-label text-label-sm tracking-wider">In - Outflow</span></button></li>
+        <li><button type="button" data-nav="level" onclick="switchTab('level')" class="nav-btn flex w-full flex-col items-center gap-gutter-xs pt-gutter-sm text-byond-nav-inactive"><span class="material-symbols-outlined text-[24px]">confirmation_number</span><span class="font-label text-label-sm">Level</span></button></li>
+        <li><button type="button" id="nav-user" data-nav="user" hidden onclick="switchTab('user')" class="nav-btn flex w-full flex-col items-center gap-gutter-xs pt-gutter-sm text-byond-nav-inactive"><span class="material-symbols-outlined text-[24px]">person</span><span class="font-label text-label-sm">Manage User</span></button></li>
+      </ul>
+      <div class="flex justify-center pb-gutter-xs" aria-hidden="true"><div class="h-1 w-32 rounded-full bg-light-on-surface"></div></div>
     </nav>
-</div>
+
+    <div id="toast" class="pointer-events-none fixed left-1/2 top-16 z-40 -translate-x-1/2 rounded-full bg-light-inverse-surface px-gutter-lg py-gutter-sm font-label text-label-sm text-light-inverse-on-surface opacity-0 transition-opacity">Tersimpan</div>
+  </div>
 
 <script>
-    const STORAGE_KEY = 'alokasi_dana_timothy_auto_v3';
-    let currentTxMode = 'pemasukan';
-    let historyFilter = 'all';
+  const TOKEN_KEY = 'sukafin_token';
+  const POS = [
+    { key: 'kebutuhan_pokok', label: 'Kebutuhan Pokok', short: 'PK', bg: 'bg-pos-pokok-bg', fg: 'text-pos-pokok-fg' },
+    { key: 'investasi', label: 'Investasi', short: 'IN', bg: 'bg-pos-invest-bg', fg: 'text-pos-invest-fg' },
+    { key: 'dana_darurat', label: 'Dana Darurat', short: 'DD', bg: 'bg-pos-darurat-bg', fg: 'text-pos-darurat-fg' },
+    { key: 'uang_bebas', label: 'Uang Bebas', short: 'UB', bg: 'bg-pos-bebas-bg', fg: 'text-pos-bebas-fg' },
+  ];
 
-    let dbData = {
-        app_name: "Alokasi Dana & 7 Tangga Kekayaan",
-        rules: {
-            kebutuhan_pokok: 0.50,
-            investasi: 0.30,
-            dana_darurat: 0.15,
-            uang_bebas: 0.05
-        },
-        records: []
-    };
+  let token = localStorage.getItem(TOKEN_KEY) || '';
+  let currentUser = null;
+  let records = [];
+  let currentMode = 'pemasukan';
+  let currentFilter = 'all';
+  let saldoVisible = false;
 
-    const POS_LABELS = {
-        kebutuhan_pokok: "Kebutuhan Pokok (50%)",
-        investasi: "Butir Investasi (30%)",
-        dana_darurat: "Butir Dana Darurat (15%)",
-        uang_bebas: "Butir Uang Bebas (5%)"
-    };
+  function formatRp(n) {
+    return 'Rp ' + Math.round(Number(n || 0)).toLocaleString('id-ID');
+  }
+  function maskRp(n) {
+    return saldoVisible ? formatRp(n) : 'Rp ••••••••';
+  }
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+  }
+  function toast(msg) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.remove('opacity-0');
+    setTimeout(() => el.classList.add('opacity-0'), 2200);
+  }
 
-    function formatRp(angka) {
-        const sign = angka < 0 ? '-' : '';
-        return sign + 'Rp ' + Math.abs(Math.round(angka)).toLocaleString('id-ID');
+  async function api(path, options = {}) {
+    const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
+    if (token) headers.Authorization = 'Bearer ' + token;
+    const res = await fetch(path, { ...options, headers });
+    let body = {};
+    try { body = await res.json(); } catch (_) {}
+    if (!res.ok) throw new Error(body.error?.message || 'Permintaan gagal');
+    return body;
+  }
+
+  async function init() {
+    if (!token) return showLogin();
+    try {
+      const me = await api('/api/me');
+      currentUser = me.user;
+      await loadData();
+      showApp();
+    } catch (_) {
+      token = '';
+      localStorage.removeItem(TOKEN_KEY);
+      showLogin();
     }
+  }
 
-    function parseNominal(str) {
-        const clean = String(str).replace(/[^0-9]/g, '');
-        return clean ? parseInt(clean, 10) : 0;
+  function showLogin() {
+    document.getElementById('login-overlay').hidden = false;
+    document.getElementById('app').hidden = true;
+  }
+  function showApp() {
+    document.getElementById('login-overlay').hidden = true;
+    document.getElementById('app').hidden = false;
+    document.getElementById('greeting-name').textContent = currentUser.username;
+    document.getElementById('greeting-role').textContent = currentUser.role;
+    document.getElementById('user-avatar').textContent = currentUser.username.slice(0, 1).toUpperCase();
+    document.getElementById('nav-user').hidden = currentUser.role !== 'superadmin';
+    switchTab('beranda');
+  }
+
+  document.getElementById('login-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const err = document.getElementById('login-error');
+    err.textContent = '';
+    try {
+      const res = await api('/api/login', {
+        method: 'POST',
+        body: JSON.stringify({
+          username: document.getElementById('login-username').value,
+          password: document.getElementById('login-password').value,
+        }),
+      });
+      token = res.token;
+      currentUser = res.user;
+      localStorage.setItem(TOKEN_KEY, token);
+      await loadData();
+      showApp();
+      toast('Selamat datang, ' + currentUser.username);
+    } catch (e2) {
+      err.textContent = e2.message;
     }
+  });
 
-    function showToast(msg) {
-        const toast = document.getElementById('toast');
-        toast.textContent = msg;
-        toast.classList.add('show');
-        setTimeout(() => toast.classList.remove('show'), 2200);
+  async function doLogout() {
+    try { await api('/api/logout', { method: 'POST' }); } catch (_) {}
+    token = '';
+    currentUser = null;
+    records = [];
+    localStorage.removeItem(TOKEN_KEY);
+    showLogin();
+  }
+
+  async function loadData() {
+    const res = await api('/api/records');
+    records = res.data;
+    renderAll();
+    if (currentUser?.role === 'superadmin') await loadUsers();
+    await loadMeta();
+  }
+
+  function stats() {
+    let masuk = 0, keluar = 0;
+    const posIn = {}, posOut = {};
+    POS.forEach(p => { posIn[p.key] = 0; posOut[p.key] = 0; });
+    records.forEach(r => {
+      if (r.tipe === 'pemasukan') {
+        masuk += r.nominal;
+        POS.forEach(p => posIn[p.key] += (r.alokasi?.[p.key] || 0));
+      } else {
+        keluar += r.nominal;
+        if (posOut[r.pos] !== undefined) posOut[r.pos] += r.nominal;
+      }
+    });
+    const saldo = {};
+    POS.forEach(p => saldo[p.key] = posIn[p.key] - posOut[p.key]);
+    const aset = Math.max(0, saldo.investasi) + Math.max(0, saldo.dana_darurat);
+    const basis = keluar > 0 ? keluar : masuk * 0.5;
+    return { masuk, keluar, bersih: masuk - keluar, saldo, posIn, posOut, aset, targetDarurat: basis * 12 };
+  }
+
+  function toggleSaldo() {
+    saldoVisible = !saldoVisible;
+    renderAll();
+  }
+
+  function switchTab(name) {
+    document.querySelectorAll('.tab-panel').forEach(el => el.classList.add('hidden'));
+    const panel = document.getElementById('tab-' + name);
+    panel.classList.remove('hidden');
+    panel.classList.add('flex');
+    document.querySelectorAll('[data-nav]').forEach(btn => {
+      const active = btn.dataset.nav === name;
+      btn.classList.toggle('text-light-primary', active);
+      btn.classList.toggle('text-byond-nav-inactive', !active);
+    });
+  }
+
+  function setFilter(filter, btn) {
+    currentFilter = filter;
+    document.querySelectorAll('.filter-btn').forEach(b => {
+      b.classList.add('bg-light-surface-container');
+      b.classList.remove('bg-light-primary', 'text-light-on-primary');
+    });
+    btn.classList.remove('bg-light-surface-container');
+    btn.classList.add('bg-light-primary', 'text-light-on-primary');
+    renderHistory();
+  }
+
+  function renderAll() {
+    const s = stats();
+    document.getElementById('saldo-text').textContent = maskRp(s.bersih);
+    document.getElementById('saldo-eye').textContent = saldoVisible ? 'visibility' : 'visibility_off';
+    document.getElementById('bal-pokok').textContent = maskRp(s.saldo.kebutuhan_pokok);
+    document.getElementById('bal-investasi').textContent = maskRp(s.saldo.investasi);
+    document.getElementById('bal-darurat').textContent = maskRp(s.saldo.dana_darurat);
+    document.getElementById('bal-bebas').textContent = maskRp(s.saldo.uang_bebas);
+    document.getElementById('meta-masuk').textContent = formatRp(s.masuk);
+    document.getElementById('meta-keluar').textContent = formatRp(s.keluar);
+    document.getElementById('meta-bersih').textContent = formatRp(s.bersih);
+
+    document.getElementById('wallet-grid').innerHTML = POS.map(p => `
+      <div class="rounded-lg ${p.bg} p-gutter-lg">
+        <p class="font-label text-label-md ${p.fg}">${p.label}</p>
+        <p class="mt-gutter-sm font-title text-title-md ${p.fg}">${formatRp(s.saldo[p.key])}</p>
+        <p class="mt-gutter-xs font-body text-body-sm ${p.fg} opacity-70">Terpakai ${formatRp(s.posOut[p.key])}</p>
+      </div>`).join('');
+
+    renderHistory();
+    renderLevel(s);
+    updatePreview();
+  }
+
+  function renderHistory() {
+    const list = currentFilter === 'all' ? records : records.filter(r => r.tipe === currentFilter);
+    document.getElementById('history-count').textContent = list.length + ' transaksi';
+    const el = document.getElementById('history-list');
+    if (!list.length) {
+      el.innerHTML = `<li class="rounded-lg border border-dashed border-light-outline-variant p-gutter-lg text-center font-body text-body-md text-light-on-surface-variant">Belum ada transaksi.</li>`;
+      return;
     }
+    el.innerHTML = list.map(r => {
+      const isIn = r.tipe === 'pemasukan';
+      const pos = POS.find(p => p.key === r.pos);
+      return `<li class="flex items-center gap-gutter-12">
+        <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full ${isIn ? 'bg-pos-invest-bg text-pos-invest-fg' : 'bg-pos-darurat-bg text-pos-darurat-fg'} font-title text-title-md">${isIn ? '+' : '-'}</span>
+        <div class="min-w-0 flex-1">
+          <p class="truncate font-title text-title-md">${escapeHtml(r.nama)} <span class="${isIn ? 'text-pos-invest-fg' : 'text-light-error'}">- ${formatRp(r.nominal)}</span></p>
+          <p class="truncate font-body text-body-sm text-light-on-surface-variant">${isIn ? 'Pemasukan' : (pos?.label || 'Pengeluaran')} • ${escapeHtml(r.tanggal)}</p>
+        </div>
+        <button type="button" aria-label="Hapus transaksi" onclick="deleteRecord(${r.id})" class="text-light-on-surface-variant"><span class="material-symbols-outlined text-[20px]">delete</span></button>
+      </li>`;
+    }).join('');
+  }
 
-    function switchTab(tabName, btnEl) {
-        document.querySelectorAll('.tab-panel').forEach(el => el.classList.remove('active'));
-        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-        document.getElementById('tab-' + tabName).classList.add('active');
-        btnEl.classList.add('active');
-        if (tabName === 'database') renderJSONViewer();
-    }
+  function renderLevel(s) {
+    const targetPendidikan = Math.max(50000000, s.targetDarurat * 1.5);
+    const steps = [
+      { title: 'Modal Awal Rp10 Juta', pct: Math.min(100, s.aset / 10000000 * 100), metric: `${formatRp(s.aset)} / Rp 10.000.000` },
+      { title: 'Bebas Utang Konsumtif', pct: s.masuk > 0 && s.saldo.kebutuhan_pokok >= 0 && s.saldo.uang_bebas >= 0 ? 100 : (s.masuk > 0 ? Math.max(0, Math.min(90, (1 - s.keluar / s.masuk) * 100)) : 0), metric: s.masuk > 0 ? (s.saldo.kebutuhan_pokok >= 0 ? 'Arus kas positif' : 'Ada pos minus') : 'Belum ada pemasukan' },
+      { title: 'Dana Darurat 12x', pct: s.targetDarurat > 0 ? Math.min(100, Math.max(0, s.saldo.dana_darurat) / s.targetDarurat * 100) : 0, metric: `${formatRp(Math.max(0, s.saldo.dana_darurat))} / ${formatRp(s.targetDarurat)}` },
+      { title: 'Investasi Rutin 20%', pct: s.masuk > 0 ? Math.min(100, Math.max(0, s.saldo.investasi) / (s.masuk * 0.2) * 100) : 0, metric: s.masuk > 0 ? `${(Math.max(0, s.saldo.investasi) / s.masuk * 100).toFixed(1)}% dari pemasukan` : 'Rp 0' },
+      { title: 'Dana Pendidikan', pct: Math.min(100, Math.max(0, s.saldo.investasi) / targetPendidikan * 100), metric: `${formatRp(Math.max(0, s.saldo.investasi))} / ${formatRp(targetPendidikan)}` },
+      { title: 'Lunasi KPR Lebih Cepat', pct: Math.min(100, s.aset / 500000000 * 100), metric: `${formatRp(s.aset)} / Rp 500.000.000` },
+      { title: 'Filantropi & Berbagi', pct: Math.min(100, s.aset / 15000000000 * 100), metric: `${formatRp(s.aset)} / Rp 15.000.000.000` },
+    ];
+    const done = steps.filter(x => x.pct >= 100).length;
+    const overall = Math.round(steps.reduce((a, x) => a + x.pct, 0) / steps.length);
+    document.getElementById('steps-progress').textContent = `${done} / 7 (${overall}%)`;
+    document.getElementById('summary-progress').textContent = `7 Tangga: ${done}/7 Selesai (${overall}%)`;
+    document.getElementById('summary-bar').style.width = overall + '%';
 
-    // Switch Pemasukan vs Pengeluaran
-    function setTxMode(mode) {
-        currentTxMode = mode;
-        const btnIn = document.getElementById('btn-mode-in');
-        const btnOut = document.getElementById('btn-mode-out');
-        const groupPos = document.getElementById('group-pos');
-        const prevIn = document.getElementById('preview-income');
-        const prevOut = document.getElementById('preview-expense');
-        const labelNama = document.getElementById('label-nama');
-        const inputNama = document.getElementById('input-nama');
-        const btnSubmit = document.getElementById('btn-submit-tx');
+    document.getElementById('steps-container').innerHTML = steps.map((x, i) => `
+      <div class="rounded-lg border border-light-outline-variant/30 bg-white p-gutter-lg">
+        <div class="flex items-center justify-between">
+          <span class="font-label text-label-md text-light-on-surface-variant">Tangga ${i + 1}</span>
+          <span class="rounded-full px-2 py-0.5 font-label text-label-sm ${x.pct >= 100 ? 'bg-light-primary-container text-light-on-primary-container' : 'bg-light-surface-container text-light-on-surface-variant'}">${x.pct >= 100 ? '✓ Tercapai' : x.pct.toFixed(0) + '%'}</span>
+        </div>
+        <p class="mt-gutter-sm font-title text-title-md">${x.title}</p>
+        <p class="mt-gutter-xs font-body text-body-sm text-light-on-surface-variant">${x.metric}</p>
+        <div class="mt-gutter-sm h-1.5 overflow-hidden rounded-full bg-light-surface-container-high"><div class="h-full rounded-full bg-light-primary" style="width:${Math.min(100, x.pct)}%"></div></div>
+      </div>`).join('');
 
-        if (mode === 'pemasukan') {
-            btnIn.className = 'mode-btn active-in';
-            btnOut.className = 'mode-btn';
-            groupPos.style.display = 'none';
-            prevIn.style.display = 'flex';
-            prevOut.style.display = 'none';
-            labelNama.textContent = 'Sumber Pemasukan';
-            inputNama.placeholder = 'Contoh: Gaji Bulanan, Freelance';
-            btnSubmit.textContent = '+ Simpan & Alokasikan';
-            btnSubmit.classList.remove('btn-danger-submit');
-        } else {
-            btnIn.className = 'mode-btn';
-            btnOut.className = 'mode-btn active-out';
-            groupPos.style.display = 'block';
-            prevIn.style.display = 'none';
-            prevOut.style.display = 'flex';
-            labelNama.textContent = 'Nama Kebutuhan / Pengeluaran';
-            inputNama.placeholder = 'Contoh: Belanja Bulanan, Bayar Listrik, Beli Aset';
-            btnSubmit.textContent = '- Catat Pengeluaran';
-            btnSubmit.classList.add('btn-danger-submit');
-            updateExpensePreview();
-        }
-    }
+    const level = s.aset >= 500000000000 ? 5 : s.aset >= 150000000000 ? 4 : s.aset >= 15000000000 ? 3 : s.aset >= 10000000 ? 2 : 1;
+    const titles = ['', 'Level 1: Survival', 'Level 2: Modal Awal', 'Level 3: Financial Independence', 'Level 4: Financial Freedom', 'Level 5: Financial Purpose'];
+    document.getElementById('level-title').textContent = titles[level];
+    document.getElementById('level-desc').textContent = level === 1
+      ? 'Fokus catat anggaran, jaga arus kas positif, dan kumpulkan modal awal Rp10 juta.'
+      : 'Aset produktifmu terus bertumbuh. Pertahankan disiplin alokasi 50/30/15/5.';
+  }
 
-    function handleNominalInput(el) {
-        const val = parseNominal(el.value);
-        el.value = val > 0 ? val.toLocaleString('id-ID') : '';
-        if (currentTxMode === 'pemasukan') {
-            document.getElementById('prev-pokok').textContent = formatRp(val * 0.50);
-            document.getElementById('prev-investasi').textContent = formatRp(val * 0.30);
-            document.getElementById('prev-darurat').textContent = formatRp(val * 0.15);
-            document.getElementById('prev-bebas').textContent = formatRp(val * 0.05);
-        } else {
-            updateExpensePreview();
-        }
-    }
+  function setMode(mode) {
+    currentMode = mode;
+    document.getElementById('mode-in').className = mode === 'pemasukan' ? 'rounded-md bg-light-primary py-2.5 font-label text-label-lg text-light-on-primary' : 'rounded-md py-2.5 font-label text-label-lg text-light-on-surface-variant';
+    document.getElementById('mode-out').className = mode === 'pengeluaran' ? 'rounded-md bg-light-primary py-2.5 font-label text-label-lg text-light-on-primary' : 'rounded-md py-2.5 font-label text-label-lg text-light-on-surface-variant';
+    document.getElementById('group-pos').hidden = mode !== 'pengeluaran';
+    document.getElementById('tx-label').textContent = mode === 'pemasukan' ? 'Sumber Pemasukan' : 'Nama Pengeluaran';
+    document.getElementById('tx-submit').textContent = mode === 'pemasukan' ? '+ Simpan & Alokasikan' : '- Catat Pengeluaran';
+    updatePreview();
+  }
 
-    function updateExpensePreview() {
-        const stats = calculateStats();
-        const pos = document.getElementById('input-pos').value;
-        const val = parseNominal(document.getElementById('input-nominal').value);
-        const currentBal = stats.saldo[pos] || 0;
-        const afterBal = currentBal - val;
+  function formatNominal(el) {
+    const n = Number(String(el.value).replace(/\D/g, ''));
+    el.value = n > 0 ? n.toLocaleString('id-ID') : '';
+    updatePreview();
+  }
 
-        document.getElementById('prev-pos-before').textContent = formatRp(currentBal);
-        const afterEl = document.getElementById('prev-pos-after');
-        afterEl.textContent = formatRp(afterBal);
-        afterEl.style.color = afterBal < 0 ? 'var(--danger)' : 'var(--text-main)';
-    }
+  function updatePreview() {
+    const n = Number(String(document.getElementById('tx-nominal')?.value || '').replace(/\D/g, '')) || 0;
+    document.getElementById('prev-pokok').textContent = formatRp(n * 0.5);
+    document.getElementById('prev-investasi').textContent = formatRp(n * 0.3);
+    document.getElementById('prev-darurat').textContent = formatRp(n * 0.15);
+    document.getElementById('prev-bebas').textContent = formatRp(n * 0.05);
+  }
 
-    // Hitung Semua Saldo & Statistik
-    function calculateStats() {
-        let totalMasuk = 0;
-        let totalKeluar = 0;
+  document.getElementById('tx-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const nama = document.getElementById('tx-nama').value.trim();
+    const nominal = Number(String(document.getElementById('tx-nominal').value).replace(/\D/g, ''));
+    if (!nama || nominal <= 0) return toast('Isi nama dan nominal dengan benar');
+    try {
+      await api('/api/records', {
+        method: 'POST',
+        body: JSON.stringify({
+          tipe: currentMode,
+          nama,
+          nominal,
+          pos: currentMode === 'pengeluaran' ? document.getElementById('tx-pos').value : null,
+          tanggal: new Date().toLocaleDateString('id-ID', { day:'2-digit', month:'short', year:'numeric' }) + ' - ' + new Date().toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' }),
+        }),
+      });
+      e.target.reset();
+      updatePreview();
+      await loadData();
+      toast('Transaksi tersimpan');
+    } catch (err) { toast(err.message); }
+  });
 
-        const masukPos = { kebutuhan_pokok: 0, investasi: 0, dana_darurat: 0, uang_bebas: 0 };
-        const keluarPos = { kebutuhan_pokok: 0, investasi: 0, dana_darurat: 0, uang_bebas: 0 };
+  async function deleteRecord(id) {
+    try {
+      await api('/api/records/' + id, { method: 'DELETE' });
+      await loadData();
+      toast('Transaksi dihapus');
+    } catch (err) { toast(err.message); }
+  }
 
-        dbData.records.forEach(item => {
-            const tipe = item.tipe || 'pemasukan';
-            if (tipe === 'pemasukan') {
-                totalMasuk += item.nominal;
-                masukPos.kebutuhan_pokok += item.alokasi.kebutuhan_pokok;
-                masukPos.investasi += item.alokasi.investasi;
-                masukPos.dana_darurat += item.alokasi.dana_darurat;
-                masukPos.uang_bebas += item.alokasi.uang_bebas;
-            } else {
-                totalKeluar += item.nominal;
-                if (keluarPos[item.pos] !== undefined) {
-                    keluarPos[item.pos] += item.nominal;
-                }
-            }
-        });
+  async function loadUsers() {
+    const res = await api('/api/users');
+    document.getElementById('users-list').innerHTML = res.data.map(u => `
+      <div class="flex items-center justify-between rounded-lg border border-light-outline-variant/30 bg-white p-gutter-12">
+        <div>
+          <p class="font-title text-title-md">${escapeHtml(u.username)} ${u.role === 'superadmin' ? '★' : ''}</p>
+          <p class="font-body text-body-sm text-light-on-surface-variant">${u.role} • ${u.recordCount} transaksi</p>
+        </div>
+        <button type="button" onclick="deleteUser(${u.id})" ${u.id === currentUser.id ? 'disabled' : ''} class="rounded-lg border border-light-error/30 px-3 py-1.5 font-label text-label-sm text-light-error disabled:opacity-40">${u.id === currentUser.id ? 'Akun ini' : 'Hapus'}</button>
+      </div>`).join('');
+  }
 
-        const saldo = {
-            kebutuhan_pokok: masukPos.kebutuhan_pokok - keluarPos.kebutuhan_pokok,
-            investasi: masukPos.investasi - keluarPos.investasi,
-            dana_darurat: masukPos.dana_darurat - keluarPos.dana_darurat,
-            uang_bebas: masukPos.uang_bebas - keluarPos.uang_bebas
-        };
+  document.getElementById('user-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    try {
+      await api('/api/users', {
+        method: 'POST',
+        body: JSON.stringify({
+          username: document.getElementById('new-username').value,
+          password: document.getElementById('new-password').value,
+        }),
+      });
+      e.target.reset();
+      await loadUsers();
+      await loadMeta();
+      toast('User dibuat');
+    } catch (err) { toast(err.message); }
+  });
 
-        const totalSaldo = totalMasuk - totalKeluar;
-        const asetProduktif = Math.max(0, saldo.dana_darurat) + Math.max(0, saldo.investasi);
+  async function deleteUser(id) {
+    try {
+      await api('/api/users/' + id, { method: 'DELETE' });
+      await loadUsers();
+      await loadMeta();
+      toast('User dihapus beserta datanya');
+    } catch (err) { toast(err.message); }
+  }
 
-        // Basis pengeluaran bulanan untuk target 12x dana darurat
-        const basisPengeluaran = totalKeluar > 0 ? totalKeluar : (totalMasuk * 0.50);
-        const targetDarurat = basisPengeluaran * 12;
+  async function loadMeta() {
+    try {
+      const m = await api('/api/meta');
+      document.getElementById('db-meta').textContent = `SQLite • schema v${m.schemaVersion} • ${m.users} akun • ${m.records} transaksi`;
+    } catch (_) {}
+  }
 
-        // Rasio pengeluaran terhadap pemasukan (untuk evaluasi bebas utang konsumtif)
-        const rasioKeluar = totalMasuk > 0 ? (totalKeluar / totalMasuk) : 1;
+  async function downloadBackup() {
+    try {
+      const res = await fetch('/api/backup', { headers: { Authorization: 'Bearer ' + token } });
+      if (!res.ok) throw new Error('Gagal mengunduh backup');
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'sukafin.sqlite';
+      a.click();
+      URL.revokeObjectURL(url);
+      toast('Backup SQLite diunduh');
+    } catch (err) { toast(err.message); }
+  }
 
-        return {
-            totalMasuk,
-            totalKeluar,
-            totalSaldo,
-            saldo,
-            masukPos,
-            keluarPos,
-            asetProduktif,
-            targetDarurat,
-            rasioKeluar
-        };
-    }
-
-    // Submit Transaksi (Satu-satunya input manual)
-    function handleTxSubmit(e) {
-        e.preventDefault();
-        const namaInput = document.getElementById('input-nama');
-        const nominalInput = document.getElementById('input-nominal');
-        const nama = namaInput.value.trim();
-        const nominal = parseNominal(nominalInput.value);
-
-        if (!nama || nominal <= 0) {
-            showToast('Isi keterangan dan nominal yang valid');
-            return;
-        }
-
-        const tanggal = new Date().toLocaleDateString('id-ID', {
-            day: '2-digit',
-            month: 'short',
-            year: 'numeric'
-        });
-
-        if (currentTxMode === 'pemasukan') {
-            dbData.records.unshift({
-                id: Date.now(),
-                tipe: 'pemasukan',
-                nama: nama,
-                nominal: nominal,
-                alokasi: {
-                    kebutuhan_pokok: nominal * 0.50,
-                    investasi: nominal * 0.30,
-                    dana_darurat: nominal * 0.15,
-                    uang_bebas: nominal * 0.05
-                },
-                tanggal: tanggal
-            });
-            showToast('Pemasukan berhasil dialokasikan');
-        } else {
-            const pos = document.getElementById('input-pos').value;
-            dbData.records.unshift({
-                id: Date.now(),
-                tipe: 'pengeluaran',
-                nama: nama,
-                pos: pos,
-                nominal: nominal,
-                tanggal: tanggal
-            });
-            showToast('Pengeluaran berhasil dicatat');
-        }
-
-        saveToLocal();
-        renderAll();
-
-        namaInput.value = '';
-        nominalInput.value = '';
-        handleNominalInput(nominalInput);
-    }
-
-    function deleteRecord(id) {
-        dbData.records = dbData.records.filter(item => item.id !== id);
-        saveToLocal();
-        renderAll();
-        showToast('Transaksi dihapus');
-    }
-
-    // Render Semua Komponen
-    function renderAll() {
-        const stats = calculateStats();
-
-        document.getElementById('total-saldo').textContent = formatRp(stats.totalSaldo);
-        document.getElementById('meta-pemasukan').textContent = 'Masuk: ' + formatRp(stats.totalMasuk);
-        document.getElementById('meta-pengeluaran').textContent = 'Keluar: ' + formatRp(stats.totalKeluar);
-
-        document.getElementById('bal-pokok').textContent = formatRp(stats.saldo.kebutuhan_pokok);
-        document.getElementById('sub-pokok').textContent = 'Terpakai: ' + formatRp(stats.keluarPos.kebutuhan_pokok);
-
-        document.getElementById('bal-investasi').textContent = formatRp(stats.saldo.investasi);
-        document.getElementById('sub-investasi').textContent = 'Terpakai: ' + formatRp(stats.keluarPos.investasi);
-
-        document.getElementById('bal-darurat').textContent = formatRp(stats.saldo.dana_darurat);
-        document.getElementById('sub-darurat').textContent = 'Terpakai: ' + formatRp(stats.keluarPos.dana_darurat);
-
-        document.getElementById('bal-bebas').textContent = formatRp(stats.saldo.uang_bebas);
-        document.getElementById('sub-bebas').textContent = 'Terpakai: ' + formatRp(stats.keluarPos.uang_bebas);
-
-        renderLadderAndLevels(stats);
-        renderHistory();
-        renderJSONViewer();
-        if (currentTxMode === 'pengeluaran') updateExpensePreview();
-    }
-
-    // Kalkulasi 100% Otomatis untuk 7 Tangga Kekayaan & 5 Level Kebebasan Finansial
-    function renderLadderAndLevels(stats) {
-        const targetPendidikan = Math.max(50000000, stats.targetDarurat * 1.5); // Acuan dana pendidikan awal Rp50jt / 1.5x darurat
-        const targetKprBebas = 500000000; // Acuan aset pelunasan KPR Rp500jt
-        const targetFilantropi = 15000000000; // Acuan tahap kemandirian/filantropi Rp15M
-
-        const autoSteps = [
-            {
-                id: 1,
-                title: "Kumpulkan Modal Awal Rp10 Juta",
-                desc: "Pegangan tunai pertama dari akumulasi saldo Dana Darurat + Butir Investasi.",
-                current: stats.asetProduktif,
-                target: 10000000,
-                pct: Math.min(100, (stats.asetProduktif / 10000000) * 100),
-                metricText: `${formatRp(stats.asetProduktif)} / Rp 10.000.000`
-            },
-            {
-                id: 2,
-                title: "Lunasi Seluruh Utang Konsumtif",
-                desc: "Arus kas sehat: saldo bersih positif & seluruh pos alokasi tidak minus.",
-                current: stats.totalMasuk > 0 && stats.saldo.kebutuhan_pokok >= 0 && stats.saldo.uang_bebas >= 0 ? 100 : 0,
-                target: 100,
-                pct: (stats.totalMasuk > 0 && stats.saldo.kebutuhan_pokok >= 0 && stats.saldo.uang_bebas >= 0)
-                    ? 100
-                    : (stats.totalMasuk > 0 ? Math.max(0, Math.min(90, (1 - stats.rasioKeluar) * 100)) : 0),
-                metricText: stats.totalMasuk === 0
-                    ? "Belum ada pemasukan"
-                    : (stats.saldo.kebutuhan_pokok >= 0 && stats.saldo.uang_bebas >= 0 ? "Arus Kas Positif (Bebas Defisit)" : "Ada Pos Minus")
-            },
-            {
-                id: 3,
-                title: "Bangun Dana Darurat Penuh (12x Pengeluaran)",
-                desc: "Dana darurat likuid setara 12 bulan pengeluaran sebelum risiko besar.",
-                current: Math.max(0, stats.saldo.dana_darurat),
-                target: stats.targetDarurat,
-                pct: stats.targetDarurat > 0 ? Math.min(100, (Math.max(0, stats.saldo.dana_darurat) / stats.targetDarurat) * 100) : 0,
-                metricText: `${formatRp(Math.max(0, stats.saldo.dana_darurat))} / ${formatRp(stats.targetDarurat)}`
-            },
-            {
-                id: 4,
-                title: "Investasi Rutin Minimal 20% Penghasilan",
-                desc: "Alokasi otomatis 30% penghasilan masuk ke pos Butir Investasi.",
-                current: Math.max(0, stats.saldo.investasi),
-                target: stats.totalMasuk * 0.20,
-                pct: stats.totalMasuk > 0 ? Math.min(100, (Math.max(0, stats.saldo.investasi) / (stats.totalMasuk * 0.20)) * 100) : 0,
-                metricText: stats.totalMasuk > 0
-                    ? `Rasio Investasi: ${((Math.max(0, stats.saldo.investasi) / stats.totalMasuk) * 100).toFixed(1)}% (Min 20%)`
-                    : "Rp 0 / Min 20%"
-            },
-            {
-                id: 5,
-                title: "Siapkan Dana Pendidikan Anak Sejak Dini",
-                desc: "Cadangan dana pendidikan terpisah dari surplus investasi jangka menengah.",
-                current: Math.max(0, stats.saldo.investasi),
-                target: targetPendidikan,
-                pct: Math.min(100, (Math.max(0, stats.saldo.investasi) / targetPendidikan) * 100),
-                metricText: `${formatRp(Math.max(0, stats.saldo.investasi))} / ${formatRp(targetPendidikan)}`
-            },
-            {
-                id: 6,
-                title: "Lunasi KPR Lebih Cepat",
-                desc: "Surplus aset produktif cukup untuk melunasi cicilan properti & bebaskan arus kas.",
-                current: stats.asetProduktif,
-                target: targetKprBebas,
-                pct: Math.min(100, (stats.asetProduktif / targetKprBebas) * 100),
-                metricText: `${formatRp(stats.asetProduktif)} / ${formatRp(targetKprBebas)}`
-            },
-            {
-                id: 7,
-                title: "Filantropi & Berbagi Kekayaan",
-                desc: "Kemandirian aset tercapai untuk memberi dampak sosial berkelanjutan.",
-                current: stats.asetProduktif,
-                target: targetFilantropi,
-                pct: Math.min(100, (stats.asetProduktif / targetFilantropi) * 100),
-                metricText: `${formatRp(stats.asetProduktif)} / ${formatRp(targetFilantropi)}`
-            }
-        ];
-
-        const achievedCount = autoSteps.filter(s => s.pct >= 100).length;
-        const overallStepsPct = Math.round(autoSteps.reduce((acc, s) => acc + s.pct, 0) / 7);
-
-        document.getElementById('steps-progress-text').textContent = `${achievedCount} / 7 (${overallStepsPct}%)`;
-        document.getElementById('summary-step-label').textContent = `7 Tangga: ${achievedCount}/7 Selesai (${overallStepsPct}%)`;
-        document.getElementById('summary-step-bar').style.width = `${overallStepsPct}%`;
-        document.getElementById('ladder-step-pct').textContent = `7 Tangga: ${overallStepsPct}%`;
-        document.getElementById('ladder-aset-aktif').textContent = `Aset Darurat + Invest: ${formatRp(stats.asetProduktif)}`;
-
-        // Render 7 Tangga Cards
-        document.getElementById('seven-steps-container').innerHTML = autoSteps.map(step => {
-            const isDone = step.pct >= 100;
-            const pctLabel = step.pct < 1 && step.pct > 0 ? step.pct.toFixed(2) : step.pct.toFixed(0);
-            return `
-                <div class="step-card ${isDone ? 'achieved' : ''}">
-                    <div class="step-top">
-                        <span class="step-num">Tangga ${step.id}</span>
-                        <span class="step-status-badge ${isDone ? 'status-done' : 'status-progress'}">
-                            ${isDone ? '✓ Tercapai (100%)' : `${pctLabel}%`}
-                        </span>
-                    </div>
-                    <div class="step-title">${step.title}</div>
-                    <div class="step-desc">${step.desc}</div>
-                    <div class="step-metric">
-                        <span>Progres Otomatis</span>
-                        <span>${step.metricText}</span>
-                    </div>
-                    <div class="level-bar">
-                        <div class="level-bar-fill" style="width: ${Math.min(100, step.pct)}%;"></div>
-                    </div>
-                </div>
-            `;
-        }).join('');
-
-        // 5 Level Kebebasan Finansial
-        const TARGET_FI = 15000000000;   // Rp 15 Miliar
-        const TARGET_FF = 150000000000;  // Rp 150 Miliar
-        const TARGET_FP = 500000000000;  // Rp 500 Miliar
-
-        const pctLv1 = Math.min(100, (stats.asetProduktif / 10000000) * 100);
-        const pctLv2 = stats.targetDarurat > 0 ? Math.min(100, (Math.max(0, stats.saldo.dana_darurat) / stats.targetDarurat) * 100) : 0;
-        const pctLv3 = Math.min(100, (stats.asetProduktif / TARGET_FI) * 100);
-        const pctLv4 = Math.min(100, (stats.asetProduktif / TARGET_FF) * 100);
-        const pctLv5 = Math.min(100, (stats.asetProduktif / TARGET_FP) * 100);
-
-        let currentLevel = 1;
-        let levelTitle = "Level 1: Survival (Bertahan Hidup)";
-        let levelDesc = "Fokus catat anggaran, jaga arus kas positif, dan kumpulkan modal awal Rp10 juta pertama.";
-        let nextTargetText = `Menuju Lv 2: ${pctLv2.toFixed(1)}%`;
-
-        if (stats.asetProduktif >= TARGET_FP) {
-            currentLevel = 5;
-            levelTitle = "Level 5: Financial Purpose (Tujuan Finansial)";
-            levelDesc = "Kekayaan dialokasikan untuk dampak luas bagi pendidikan, kesehatan, dan kemanusiaan.";
-            nextTargetText = "Level Tertinggi Tercapai";
-        } else if (stats.asetProduktif >= TARGET_FF) {
-            currentLevel = 4;
-            levelTitle = "Level 4: Financial Freedom (~Rp150 Miliar)";
-            levelDesc = "Merdeka sepenuhnya atas waktu dan lokasi tanpa terikat jadwal kerja.";
-            nextTargetText = `Menuju Lv 5: ${pctLv5.toFixed(2)}%`;
-        } else if (stats.asetProduktif >= TARGET_FI) {
-            currentLevel = 3;
-            levelTitle = "Level 3: Financial Independence (~Rp15 Miliar)";
-            levelDesc = "Biaya hidup ditopang sepenuhnya oleh imbal hasil investasi tanpa wajib bekerja.";
-            nextTargetText = `Menuju Lv 4: ${pctLv4.toFixed(2)}%`;
-        } else if (stats.targetDarurat > 0 && stats.saldo.dana_darurat >= stats.targetDarurat) {
-            currentLevel = 2;
-            levelTitle = "Level 2: Financial Stability (Stabilitas)";
-            levelDesc = "Dana darurat 12 bulan terpenuhi. Waspada 'zona tipuan', terus agresif bangun investasi.";
-            nextTargetText = `Menuju Lv 3 (15M): ${pctLv3.toFixed(2)}%`;
-        }
-
-        document.getElementById('badge-current-level').textContent = `Level ${currentLevel}`;
-        document.getElementById('summary-next-target').textContent = nextTargetText;
-        document.getElementById('ladder-status-title').textContent = levelTitle;
-        document.getElementById('ladder-status-desc').textContent = levelDesc;
-
-        const levelsData = [
-            {
-                lvl: 1,
-                name: "1. Survival (Bertahan Hidup)",
-                pct: Math.max(0, pctLv1),
-                desc: "Membangun fondasi awal Rp10 juta pertama dan menjaga arus kas tidak defisit."
-            },
-            {
-                lvl: 2,
-                name: "2. Financial Stability (Dana Darurat 12 Bulan)",
-                pct: Math.max(0, pctLv2),
-                desc: `Dana darurat likuid setara 12x pengeluaran (${formatRp(stats.targetDarurat)}). Waspada zona tipuan.`
-            },
-            {
-                lvl: 3,
-                name: "3. Financial Independence (Target ~Rp15 Miliar)",
-                pct: Math.max(0, pctLv3),
-                desc: "Biaya hidup ditopang imbal hasil investasi (>15% CAGR) tanpa wajib bekerja lagi."
-            },
-            {
-                lvl: 4,
-                name: "4. Financial Freedom (Target ~Rp150 Miliar)",
-                pct: Math.max(0, pctLv4),
-                desc: "Kemerdekaan penuh atas waktu dan lokasi dengan gaya hidup mandiri sepenuhnya."
-            },
-            {
-                lvl: 5,
-                name: "5. Financial Purpose (Dampak Masyarakat)",
-                pct: Math.max(0, pctLv5),
-                desc: "Kekayaan difokuskan untuk mendanai pendidikan, kesehatan, teknologi, atau aksi kemanusiaan."
-            }
-        ];
-
-        document.getElementById('five-levels-container').innerHTML = levelsData.map(item => {
-            const pctFormatted = item.pct < 1 && item.pct > 0 ? item.pct.toFixed(2) : item.pct.toFixed(1);
-            return `
-                <div class="level-card ${item.lvl === currentLevel ? 'current-level' : ''}">
-                    <div class="level-header">
-                        <span class="level-title">${item.name}</span>
-                        <span class="level-pct">${pctFormatted}%</span>
-                    </div>
-                    <div class="level-desc">${item.desc}</div>
-                    <div class="level-bar">
-                        <div class="level-bar-fill" style="width: ${Math.min(100, item.pct)}%;"></div>
-                    </div>
-                </div>
-            `;
-        }).join('');
-    }
-
-    // Filter & Render Riwayat
-    function setHistoryFilter(filter, btnEl) {
-        historyFilter = filter;
-        document.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
-        btnEl.classList.add('active');
-        renderHistory();
-    }
-
-    function renderHistory() {
-        const container = document.getElementById('history-container');
-        const filtered = dbData.records.filter(item => {
-            const tipe = item.tipe || 'pemasukan';
-            if (historyFilter === 'all') return true;
-            return tipe === historyFilter;
-        });
-
-        document.getElementById('history-count').textContent = `${filtered.length} transaksi`;
-
-        if (filtered.length === 0) {
-            container.innerHTML = '<div class="empty-state">Belum ada catatan transaksi pada filter ini.</div>';
-            return;
-        }
-
-        container.innerHTML = filtered.map(item => {
-            const tipe = item.tipe || 'pemasukan';
-            if (tipe === 'pemasukan') {
-                return `
-                    <div class="history-item">
-                        <div class="history-header">
-                            <div>
-                                <div class="history-title">${escapeHTML(item.nama)}</div>
-                                <div class="history-meta">
-                                    <span class="bucket-badge badge-investasi">Pemasukan</span>
-                                    <span>${escapeHTML(item.tanggal || '-')}</span>
-                                </div>
-                            </div>
-                            <div class="history-right">
-                                <span class="amount-in">+${formatRp(item.nominal)}</span>
-                                <button class="btn-delete" onclick="deleteRecord(${item.id})" title="Hapus">×</button>
-                            </div>
-                        </div>
-                        <div class="history-breakdown">
-                            <div class="hb-item"><span>Pokok (50%):</span> <strong>${formatRp(item.alokasi.kebutuhan_pokok)}</strong></div>
-                            <div class="hb-item"><span>Investasi (30%):</span> <strong>${formatRp(item.alokasi.investasi)}</strong></div>
-                            <div class="hb-item"><span>Darurat (15%):</span> <strong>${formatRp(item.alokasi.dana_darurat)}</strong></div>
-                            <div class="hb-item"><span>Bebas (5%):</span> <strong>${formatRp(item.alokasi.uang_bebas)}</strong></div>
-                        </div>
-                    </div>
-                `;
-            } else {
-                const badgeClass = {
-                    kebutuhan_pokok: 'badge-pokok',
-                    investasi: 'badge-investasi',
-                    dana_darurat: 'badge-darurat',
-                    uang_bebas: 'badge-bebas'
-                }[item.pos] || 'badge-pokok';
-
-                return `
-                    <div class="history-item">
-                        <div class="history-header">
-                            <div>
-                                <div class="history-title">${escapeHTML(item.nama)}</div>
-                                <div class="history-meta">
-                                    <span class="bucket-badge ${badgeClass}">${POS_LABELS[item.pos] || item.pos}</span>
-                                    <span>${escapeHTML(item.tanggal || '-')}</span>
-                                </div>
-                            </div>
-                            <div class="history-right">
-                                <span class="amount-out">-${formatRp(item.nominal)}</span>
-                                <button class="btn-delete" onclick="deleteRecord(${item.id})" title="Hapus">×</button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }
-        }).join('');
-    }
-
-    function renderJSONViewer() {
-        const el = document.getElementById('json-preview');
-        if (el) el.textContent = JSON.stringify(dbData, null, 2);
-    }
-
-    // Inisialisasi Data (LocalStorage -> fallback db.json awal jika kosong)
-    async function initApp() {
-        const local = localStorage.getItem(STORAGE_KEY);
-        if (local) {
-            try {
-                dbData = JSON.parse(local);
-                renderAll();
-                return;
-            } catch (e) {
-                console.error('Data lokal tidak valid');
-            }
-        }
-        try {
-            const res = await fetch('./db.json?t=' + Date.now());
-            if (res.ok) {
-                const json = await res.json();
-                if (json && Array.isArray(json.records)) {
-                    dbData = json;
-                }
-            }
-        } catch (err) {
-            // Abaikan jika dibuka langsung tanpa server lokal
-        }
-        saveToLocal();
-        renderAll();
-    }
-
-    function saveToLocal() {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(dbData));
-        renderJSONViewer();
-    }
-
-    function exportJSON() {
-        const dataStr = JSON.stringify(dbData, null, 2);
-        const blob = new Blob([dataStr], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'db.json';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        showToast('db.json berhasil diunduh');
-    }
-
-    function importJSON(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const parsed = JSON.parse(e.target.result);
-                if (parsed && Array.isArray(parsed.records)) {
-                    dbData = parsed;
-                    saveToLocal();
-                    renderAll();
-                    showToast('Database berhasil diimpor');
-                } else {
-                    showToast('Format db.json tidak sesuai');
-                }
-            } catch (err) {
-                showToast('File JSON tidak valid');
-            }
-            event.target.value = '';
-        };
-        reader.readAsText(file);
-    }
-
-    function escapeHTML(str) {
-        return String(str)
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;');
-    }
-
-    initApp();
+  init();
 </script>
-
 </body>
 </html>
