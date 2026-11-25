@@ -67,6 +67,8 @@ function publicUser(row) {
     return {
         id: Number(row.id),
         username: row.username,
+        name: row.name || row.username,
+        avatar: row.avatar || null,
         role: row.role,
         createdAt: row.created_at,
     };
@@ -95,11 +97,16 @@ async function initializeDatabase(sql, adminUsername, adminPassword) {
         CREATE TABLE IF NOT EXISTS users (
             id BIGSERIAL PRIMARY KEY,
             username TEXT NOT NULL UNIQUE,
+            name TEXT NOT NULL DEFAULT '',
+            avatar TEXT,
             password_hash TEXT NOT NULL,
             role TEXT NOT NULL DEFAULT 'user' CHECK (role IN ('user', 'superadmin')),
             created_at TIMESTAMPTZ NOT NULL DEFAULT now()
         )
     `;
+    await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS name TEXT NOT NULL DEFAULT ''`;
+    await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar TEXT`;
+    await sql`UPDATE users SET name = username WHERE name = ''`;
     await sql`
         CREATE TABLE IF NOT EXISTS records (
             id BIGSERIAL PRIMARY KEY,
@@ -122,14 +129,14 @@ async function initializeDatabase(sql, adminUsername, adminPassword) {
     await sql`CREATE INDEX IF NOT EXISTS idx_records_user_id ON records(user_id)`;
     await sql`CREATE INDEX IF NOT EXISTS idx_sessions_expires_at ON sessions(expires_at)`;
     await sql`
-        INSERT INTO meta(key, value) VALUES ('schema_version', '1')
+        INSERT INTO meta(key, value) VALUES ('schema_version', '2')
         ON CONFLICT(key) DO UPDATE SET value = EXCLUDED.value
     `;
 
     const username = adminUsername.trim().toLowerCase();
     await sql`
-        INSERT INTO users(username, password_hash, role)
-        VALUES (${username}, ${hashPassword(adminPassword)}, 'superadmin')
+        INSERT INTO users(username, name, password_hash, role)
+        VALUES (${username}, ${username}, ${hashPassword(adminPassword)}, 'superadmin')
         ON CONFLICT(username) DO NOTHING
     `;
 }
@@ -154,13 +161,20 @@ function isNonEmptyString(value) {
     return typeof value === 'string' && value.trim().length > 0;
 }
 
+function isValidAvatar(value) {
+    if (value === null) return true;
+    if (typeof value !== 'string' || value.length > 350000) return false;
+    const match = value.match(/^data:image\/(png|jpeg|webp);base64,([A-Za-z0-9+/]+={0,2})$/);
+    return Boolean(match && Buffer.from(match[2], 'base64').length <= 256 * 1024);
+}
+
 async function currentUser(req, sql) {
     const header = req.headers.authorization || '';
     const token = header.startsWith('Bearer ') ? header.slice(7) : '';
     if (!token) return null;
 
     const rows = await sql`
-        SELECT u.id, u.username, u.role, u.created_at
+        SELECT u.id, u.username, u.name, u.avatar, u.role, u.created_at
         FROM sessions s
         JOIN users u ON u.id = s.user_id
         WHERE s.token_hash = ${hashToken(token)} AND s.expires_at > now()
@@ -227,6 +241,49 @@ async function handleApi(req, res, url, sql) {
         const user = await requireAuth(req, res, sql);
         if (!user) return;
         return sendJson(res, 200, { user: publicUser(user) });
+    }
+
+    if (method === 'PATCH' && route === '/api/profile') {
+        const user = await requireAuth(req, res, sql);
+        if (!user) return;
+        const body = requestBody(req);
+        const name = body.name === undefined
+            ? (user.name || user.username)
+            : typeof body.name === 'string' ? body.name.trim() : '';
+        const username = body.username === undefined
+            ? user.username
+            : typeof body.username === 'string' ? body.username.trim() : '';
+        const password = body.password === undefined || body.password === '' ? null : body.password;
+        const avatar = Object.hasOwn(body, 'avatar') ? body.avatar : user.avatar || null;
+
+        if (!isNonEmptyString(name) || name.length > 80) {
+            return fail(res, 422, 'VALIDATION_ERROR', 'Nama wajib diisi dan maksimal 80 karakter.');
+        }
+        if (!isNonEmptyString(username) || username.length > 40) {
+            return fail(res, 422, 'VALIDATION_ERROR', 'Username wajib diisi dan maksimal 40 karakter.');
+        }
+        if (password !== null && (typeof password !== 'string' || password.length < 8 || password.length > 128)) {
+            return fail(res, 422, 'VALIDATION_ERROR', 'Password baru harus 8 sampai 128 karakter.');
+        }
+        if (!isValidAvatar(avatar)) {
+            return fail(res, 422, 'VALIDATION_ERROR', 'Foto harus PNG, JPG, atau WebP dan maksimal 256 KB.');
+        }
+
+        try {
+            const rows = await sql`
+                UPDATE users
+                SET name = ${name},
+                    username = ${username.toLowerCase()},
+                    avatar = ${avatar},
+                    password_hash = COALESCE(${password ? hashPassword(password) : null}, password_hash)
+                WHERE id = ${user.id}
+                RETURNING id, username, name, avatar, role, created_at
+            `;
+            return sendJson(res, 200, { user: publicUser(rows[0]) });
+        } catch (error) {
+            if (error.code === '23505') return fail(res, 409, 'CONFLICT', 'Username sudah dipakai.');
+            throw error;
+        }
     }
 
     if (method === 'GET' && route === '/api/records') {
@@ -298,7 +355,7 @@ async function handleApi(req, res, url, sql) {
     if (method === 'GET' && route === '/api/users') {
         if (!await requireSuperadmin(req, res, sql)) return;
         const rows = await sql`
-            SELECT u.id, u.username, u.role, u.created_at,
+            SELECT u.id, u.username, u.name, u.role, u.created_at,
                    (SELECT COUNT(*) FROM records r WHERE r.user_id = u.id) AS record_count
             FROM users u ORDER BY u.id
         `;
@@ -316,9 +373,9 @@ async function handleApi(req, res, url, sql) {
         const username = body.username.trim().toLowerCase();
         try {
             const rows = await sql`
-                INSERT INTO users(username, password_hash, role)
-                VALUES (${username}, ${hashPassword(body.password)}, 'user')
-                RETURNING id, username, role, created_at
+                INSERT INTO users(username, name, password_hash, role)
+                VALUES (${username}, ${username}, ${hashPassword(body.password)}, 'user')
+                RETURNING id, username, name, role, created_at
             `;
             return sendJson(res, 201, { data: publicUser(rows[0]) });
         } catch (error) {
@@ -335,13 +392,14 @@ async function handleApi(req, res, url, sql) {
         if (targetId === Number(actor.id)) {
             return fail(res, 400, 'INVALID_OPERATION', 'Tidak bisa menghapus akun sendiri.');
         }
-        const rows = await sql`SELECT id, role FROM users WHERE id = ${targetId}`;
-        const target = rows[0];
-        if (!target) return fail(res, 404, 'NOT_FOUND', 'User tidak ditemukan.');
-        if (target.role === 'superadmin') {
-            return fail(res, 403, 'FORBIDDEN', 'Superadmin lain tidak bisa dihapus.');
+        const rows = await sql`
+            DELETE FROM users WHERE id = ${targetId} AND role = 'user' RETURNING id
+        `;
+        if (rows.length === 0) {
+            const existing = await sql`SELECT role FROM users WHERE id = ${targetId}`;
+            if (!existing[0]) return fail(res, 404, 'NOT_FOUND', 'User tidak ditemukan.');
+            return fail(res, 403, 'FORBIDDEN', 'Akun superadmin tidak bisa dihapus dari menu user.');
         }
-        await sql`DELETE FROM users WHERE id = ${targetId}`;
         return sendJson(res, 200, { ok: true });
     }
 

@@ -7,13 +7,14 @@ const crypto = require('node:crypto');
 const { DatabaseSync } = require('node:sqlite');
 
 const ROOT = __dirname;
-const DB_PATH = path.join(ROOT, 'db', 'sukafin.sqlite');
+const DB_PATH = process.env.SUKAFIN_DB_PATH || path.join(ROOT, 'db', 'sukafin.sqlite');
 const MIGRATIONS_DIR = path.join(ROOT, 'db', 'migrations');
 const SEEDS_DIR = path.join(ROOT, 'db', 'seeds');
 const PUBLIC_DIR = ROOT;
 const PORT = Number(process.env.PORT || 4173);
 const HOST = process.env.HOST || '0.0.0.0';
 
+fs.mkdirSync(path.dirname(DB_PATH), { recursive: true });
 const db = new DatabaseSync(DB_PATH);
 db.exec('PRAGMA foreign_keys = ON');
 
@@ -64,7 +65,14 @@ function hashPassword(password) {
 }
 
 function publicUser(row) {
-    return { id: row.id, username: row.username, role: row.role, createdAt: row.created_at };
+    return {
+        id: row.id,
+        username: row.username,
+        name: row.name || row.username,
+        avatar: row.avatar || null,
+        role: row.role,
+        createdAt: row.created_at,
+    };
 }
 
 function publicRecord(row) {
@@ -145,6 +153,13 @@ function isNonEmptyString(value) {
     return typeof value === 'string' && value.trim().length > 0;
 }
 
+function isValidAvatar(value) {
+    if (value === null) return true;
+    if (typeof value !== 'string' || value.length > 350000) return false;
+    const match = value.match(/^data:image\/(png|jpeg|webp);base64,([A-Za-z0-9+/]+={0,2})$/);
+    return Boolean(match && Buffer.from(match[2], 'base64').length <= 256 * 1024);
+}
+
 // ---------- API ----------
 async function handleApi(req, res, url) {
     const method = req.method;
@@ -174,6 +189,46 @@ async function handleApi(req, res, url) {
         const user = requireAuth(req, res);
         if (!user) return;
         return sendJson(res, 200, { user: publicUser(user) });
+    }
+
+    if (method === 'PATCH' && route === '/api/profile') {
+        const user = requireAuth(req, res);
+        if (!user) return;
+        const body = await readBody(req);
+        const name = body.name === undefined
+            ? (user.name || user.username)
+            : typeof body.name === 'string' ? body.name.trim() : '';
+        const username = body.username === undefined
+            ? user.username
+            : typeof body.username === 'string' ? body.username.trim() : '';
+        const password = body.password === undefined || body.password === '' ? null : body.password;
+        const avatar = Object.hasOwn(body, 'avatar') ? body.avatar : user.avatar || null;
+
+        if (!isNonEmptyString(name) || name.length > 80) {
+            return fail(res, 422, 'VALIDATION_ERROR', 'Nama wajib diisi dan maksimal 80 karakter.');
+        }
+        if (!isNonEmptyString(username) || username.length > 40) {
+            return fail(res, 422, 'VALIDATION_ERROR', 'Username wajib diisi dan maksimal 40 karakter.');
+        }
+        if (password !== null && (typeof password !== 'string' || password.length < 8 || password.length > 128)) {
+            return fail(res, 422, 'VALIDATION_ERROR', 'Password baru harus 8 sampai 128 karakter.');
+        }
+        if (!isValidAvatar(avatar)) {
+            return fail(res, 422, 'VALIDATION_ERROR', 'Foto harus PNG, JPG, atau WebP dan maksimal 256 KB.');
+        }
+
+        const normalizedUsername = username.toLowerCase();
+        const existing = db.prepare('SELECT 1 FROM users WHERE username = ? AND id != ?')
+            .get(normalizedUsername, user.id);
+        if (existing) return fail(res, 409, 'CONFLICT', 'Username sudah dipakai.');
+
+        db.prepare(`
+            UPDATE users
+            SET name = ?, username = ?, avatar = ?, password_hash = COALESCE(?, password_hash)
+            WHERE id = ?
+        `).run(name, normalizedUsername, avatar, password ? hashPassword(password) : null, user.id);
+        const updated = db.prepare('SELECT * FROM users WHERE id = ?').get(user.id);
+        return sendJson(res, 200, { user: publicUser(updated) });
     }
 
     if (method === 'GET' && route === '/api/records') {
@@ -250,7 +305,7 @@ async function handleApi(req, res, url) {
     if (method === 'GET' && route === '/api/users') {
         if (!requireSuperadmin(req, res)) return;
         const rows = db.prepare(`
-            SELECT u.id, u.username, u.role, u.created_at,
+            SELECT u.id, u.username, u.name, u.role, u.created_at,
                    (SELECT COUNT(*) FROM records r WHERE r.user_id = u.id) AS record_count
             FROM users u ORDER BY u.id
         `).all();
@@ -265,14 +320,14 @@ async function handleApi(req, res, url) {
         if (!isNonEmptyString(body.username) || !isNonEmptyString(body.password)) {
             return fail(res, 422, 'VALIDATION_ERROR', 'Username dan password wajib diisi.');
         }
-        const username = body.username.trim();
+        const username = body.username.trim().toLowerCase();
         const exists = db.prepare('SELECT 1 FROM users WHERE username = ?').get(username);
         if (exists) return fail(res, 409, 'CONFLICT', 'Username sudah dipakai.');
 
         const info = db.prepare(`
-            INSERT INTO users(username, password_hash, role, created_at)
-            VALUES(?, ?, 'user', ?)
-        `).run(username, hashPassword(body.password), new Date().toISOString());
+            INSERT INTO users(username, name, password_hash, role, created_at)
+            VALUES(?, ?, ?, 'user', ?)
+        `).run(username, username, hashPassword(body.password), new Date().toISOString());
         const created = db.prepare('SELECT * FROM users WHERE id = ?').get(info.lastInsertRowid);
         return sendJson(res, 201, { data: publicUser(created) });
     }
@@ -290,7 +345,12 @@ async function handleApi(req, res, url) {
         if (target.role === 'superadmin') {
             return fail(res, 403, 'FORBIDDEN', 'Superadmin lain tidak bisa dihapus.');
         }
-        db.prepare('DELETE FROM users WHERE id = ?').run(targetId);
+        const deleted = db.prepare("DELETE FROM users WHERE id = ? AND role = 'user'").run(targetId);
+        if (deleted.changes === 0) {
+            const target = db.prepare('SELECT role FROM users WHERE id = ?').get(targetId);
+            if (!target) return fail(res, 404, 'NOT_FOUND', 'User tidak ditemukan.');
+            return fail(res, 403, 'FORBIDDEN', 'Superadmin lain tidak bisa dihapus.');
+        }
         return sendJson(res, 200, { ok: true });
     }
 

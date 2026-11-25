@@ -43,6 +43,7 @@ Lalu buka `http://localhost:4173`. Database SQLite lokal otomatis dimigrasikan d
 | POST   | `/api/login`             | publik      | Login, mengembalikan bearer token |
 | POST   | `/api/logout`            | auth        | Hapus sesi                      |
 | GET    | `/api/me`                | auth        | Data akun aktif                 |
+| PATCH  | `/api/profile`            | auth        | Ubah nama, username, foto, atau password sendiri |
 | GET    | `/api/records`           | auth        | Transaksi milik akun aktif      |
 | POST   | `/api/records`           | auth        | Tambah transaksi                |
 | DELETE | `/api/records/:id`       | auth        | Hapus transaksi sendiri         |
@@ -62,4 +63,6 @@ npm run db:init
 
 ## Catatan
 
-Di Vercel, sesi disimpan di Neon dan berlaku 7 hari, sehingga tidak hilang saat function berhenti. Data transaksi dibatasi oleh `user_id` di server, bukan hanya di frontend. Backup production dilakukan melalui Neon.
+Beranda dan ringkasan aplikasi dapat dijelajahi tanpa login; data keuangan pribadi hanya dimuat setelah autentikasi. Mencatat transaksi akan meminta pengguna login. User dan superadmin dapat mengubah nama, username, foto profil, dan password melalui tombol profil. Foto PNG/JPG/WebP disimpan di database, maksimal 256 KB.
+
+Di Vercel, sesi disimpan di Neon dan berlaku 7 hari, sehingga tidak hilang saat function berhenti. Data transaksi dibatasi oleh `user_id` di server, bukan hanya di frontend. Superadmin dapat menghapus akun user beserta transaksi dan sesinya; akun superadmin tidak dapat dihapus dari menu tersebut. Backup production dilakukan melalui Neon.

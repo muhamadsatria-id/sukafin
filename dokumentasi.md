@@ -80,6 +80,13 @@ Jika baru menghubungkan GitHub, pastikan deployment Production menggunakan branc
 
 Setelah integrasi Git aktif, perubahan pada branch Production yang terhubung akan dideploy otomatis setiap kali di-push ke GitHub. Branch lain biasanya menghasilkan Preview Deployment. Pastikan environment **Preview** juga memiliki koneksi Neon dan kredensial admin jika Preview ingin digunakan.
 
+## Fitur saat aplikasi digunakan
+
+- Pengunjung dapat melihat halaman Beranda, Dompet, dan Level tanpa login. Data pribadi tidak ditampilkan untuk pengunjung.
+- Memilih **In - Outflow** atau mencoba menyimpan transaksi akan membuka form login. Setelah berhasil login, pengguna kembali ke form transaksi.
+- Pengguna dan superadmin dapat membuka **Kelola Profil** dari header untuk mengubah nama, username, foto, dan password. Foto yang diterima adalah PNG, JPG, atau WebP maksimal 256 KB.
+- Superadmin dapat menghapus akun bertipe `user` dari tab **Manage User**. Penghapusan juga menghapus transaksi dan sesi user tersebut. Akun superadmin dan akun yang sedang dipakai tidak bisa dihapus dari menu ini.
+
 ## Pemecahan masalah
 
 | Gejala | Yang perlu diperiksa |

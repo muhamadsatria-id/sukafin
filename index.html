@@ -81,12 +81,12 @@ if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
 <body class="bg-light-surface-container-lowest text-light-on-surface font-body antialiased">
 
   <!-- LOGIN -->
-  <div id="login-overlay" class="fixed inset-0 z-50 flex items-center justify-center bg-light-primary p-gutter-lg">
+  <div id="login-overlay" hidden class="fixed inset-0 z-50 flex items-center justify-center bg-light-primary/90 p-gutter-lg backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="login-title">
     <form id="login-form" class="w-full max-w-sm rounded-xl bg-light-surface-container-lowest p-gutter-xl shadow-[0_16px_48px_-8px_rgba(0,40,32,0.35)]">
       <div class="mb-gutter-md flex items-center gap-gutter-sm">
         <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-light-primary text-light-on-primary font-headline font-bold">S</div>
         <div>
-          <p class="font-headline text-headline-md leading-tight">SUKAFIN</p>
+          <p id="login-title" class="font-headline text-headline-md leading-tight">SUKAFIN</p>
           <p class="font-label text-label-sm text-light-on-surface-variant">by muhamadsatria</p>
         </div>
       </div>
@@ -97,7 +97,8 @@ if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
       <input id="login-password" type="password" class="mb-gutter-md w-full rounded-lg border border-light-outline-variant bg-light-surface-container-lowest px-gutter-12 py-3 font-body text-body-md outline-none focus:border-light-primary" autocomplete="current-password" required>
       <p id="login-error" class="mb-gutter-sm min-h-4 font-body text-body-sm text-light-error" role="alert"></p>
       <button type="submit" class="w-full rounded-lg bg-light-primary py-3 font-label text-label-lg text-light-on-primary">Masuk</button>
-      <p class="mt-gutter-md text-center font-body text-body-sm text-light-on-surface-variant">Login admin disiapkan melalui konfigurasi hosting.</p>
+      <button type="button" onclick="closeLogin()" class="mt-gutter-sm w-full rounded-lg py-3 font-label text-label-md text-light-on-surface-variant">Kembali jelajahi aplikasi</button>
+      <p class="mt-gutter-md text-center font-body text-body-sm text-light-on-surface-variant">Hubungi administrator untuk mendapatkan akses.<span href="https://wa.me/6285789483844" class="font-bold"> Klik di sini</span></p>
     </form>
   </div>
 
@@ -121,19 +122,24 @@ if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
           <button id="btn-backup" type="button" aria-label="Unduh backup SQLite" onclick="downloadBackup()" class="inline-flex items-center justify-center">
             <span class="material-symbols-outlined text-[22px]">database</span>
           </button>
-          <button type="button" aria-label="Keluar" onclick="doLogout()" class="inline-flex items-center justify-center">
+          <button id="btn-login" type="button" onclick="openLogin()" hidden class="rounded-full border border-white/40 px-3 py-1.5 font-label text-label-sm">Masuk</button>
+          <button id="btn-profile" type="button" aria-label="Kelola profil" onclick="openProfile()" hidden class="inline-flex items-center justify-center">
+            <span class="material-symbols-outlined text-[24px]">manage_accounts</span>
+          </button>
+          <button id="btn-logout" type="button" aria-label="Keluar" onclick="doLogout()" hidden class="inline-flex items-center justify-center">
             <span class="material-symbols-outlined text-[24px]">logout</span>
           </button>
         </div>
       </header>
 
-      <div class="relative z-10 flex items-center gap-gutter-12 px-page-margin pt-gutter-sm pb-gutter-md">
+      <button type="button" onclick="handleAccountClick()" aria-label="Masuk atau kelola profil" class="relative z-10 flex w-full items-center gap-gutter-12 px-page-margin pt-gutter-sm pb-gutter-md text-left">
         <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-light-on-primary/50 bg-light-primary text-light-on-primary font-title text-title-md" id="user-avatar">S</span>
+        <img id="user-avatar-image" alt="" hidden class="h-10 w-10 shrink-0 rounded-full border-2 border-light-on-primary/50 object-cover">
         <div class="min-w-0">
-          <span id="greeting-name" class="block truncate font-title text-title-md text-light-on-primary">Superadmin</span>
-          <span id="greeting-role" class="font-label text-label-sm text-light-on-primary/80">superadmin</span>
+          <span id="greeting-name" class="block truncate font-title text-title-md text-light-on-primary">Jelajahi SUKAFIN</span>
+          <span id="greeting-role" class="font-label text-label-sm text-light-on-primary/80">Mode tamu</span>
         </div>
-      </div>
+      </button>
 
       <section aria-label="Informasi Saldo" class="relative z-10 px-page-margin">
         <article class="relative overflow-hidden rounded-xl border border-light-outline-variant/25 bg-light-surface-container-lowest p-gutter-lg shadow-[0_8px_28px_-4px_rgba(0,32,26,0.12)]">
@@ -162,6 +168,11 @@ if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
 
       <!-- BERANDA -->
       <section id="tab-beranda" class="tab-panel flex flex-col gap-gutter-xl">
+        <section id="guest-callout" hidden class="rounded-lg border border-light-primary/20 bg-pos-pokok-bg p-gutter-lg">
+          <p class="font-title text-title-md text-pos-pokok-fg">Jelajahi SUKAFIN</p>
+          <p class="mt-gutter-xs font-body text-body-sm text-pos-pokok-fg">Masuk untuk melihat data keuangan pribadi dan mencatat transaksi.</p>
+          <button type="button" onclick="switchTab('inout')" class="mt-gutter-sm rounded-lg bg-light-primary px-4 py-2 font-label text-label-sm text-light-on-primary">Masuk untuk mulai</button>
+        </section>
         <section aria-labelledby="heading-pos">
           <div class="mb-gutter-12 flex items-center justify-between">
             <h2 id="heading-pos" class="font-headline text-headline-md">Saldo Tabungan</h2>
@@ -306,6 +317,40 @@ if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
     </nav>
 
     <div id="toast" class="pointer-events-none fixed left-1/2 top-16 z-40 -translate-x-1/2 rounded-full bg-light-inverse-surface px-gutter-lg py-gutter-sm font-label text-label-sm text-light-inverse-on-surface opacity-0 transition-opacity">Tersimpan</div>
+
+    <div id="profile-overlay" hidden class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-gutter-lg" role="dialog" aria-modal="true" aria-labelledby="profile-title">
+      <section class="max-h-[90dvh] w-full max-w-sm overflow-y-auto rounded-xl bg-light-surface-container-lowest p-gutter-xl shadow-xl">
+        <div class="mb-gutter-lg flex items-center justify-between">
+          <h2 id="profile-title" class="font-headline text-headline-md">Kelola Profil</h2>
+          <button type="button" onclick="closeProfile()" aria-label="Tutup" class="rounded-full p-2 text-light-on-surface-variant">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+        <form id="profile-form" class="flex flex-col gap-gutter-sm">
+          <div class="mb-gutter-sm flex items-center gap-gutter-md">
+            <span id="profile-avatar-fallback" class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-light-primary text-xl font-bold text-white">S</span>
+            <img id="profile-avatar-preview" alt="Foto profil" hidden class="h-16 w-16 shrink-0 rounded-full object-cover">
+            <div class="flex flex-col gap-gutter-xs">
+              <label for="profile-avatar-file" class="cursor-pointer rounded-lg border border-light-outline-variant px-3 py-2 text-center font-label text-label-sm">Pilih foto</label>
+              <input id="profile-avatar-file" type="file" accept="image/png,image/jpeg,image/webp" class="sr-only">
+              <button id="profile-avatar-remove" type="button" onclick="removeProfileAvatar()" class="text-left font-label text-label-sm text-light-error">Hapus foto</button>
+            </div>
+          </div>
+          <label for="profile-name" class="font-label text-label-md">Nama</label>
+          <input id="profile-name" maxlength="80" required class="rounded-lg border border-light-outline-variant px-gutter-12 py-3 font-body text-body-md outline-none focus:border-light-primary">
+          <label for="profile-username" class="font-label text-label-md">Username</label>
+          <input id="profile-username" maxlength="40" autocomplete="username" required class="rounded-lg border border-light-outline-variant px-gutter-12 py-3 font-body text-body-md outline-none focus:border-light-primary">
+          <label for="profile-password" class="font-label text-label-md">Password baru (opsional)</label>
+          <input id="profile-password" type="password" minlength="8" maxlength="128" autocomplete="new-password" placeholder="Kosongkan jika tidak ingin mengganti" class="rounded-lg border border-light-outline-variant px-gutter-12 py-3 font-body text-body-md outline-none focus:border-light-primary">
+          <p class="font-body text-body-sm text-light-on-surface-variant">Foto PNG, JPG, atau WebP, maksimal 256 KB.</p>
+          <p id="profile-error" class="min-h-4 font-body text-body-sm text-light-error" role="alert"></p>
+          <div class="mt-gutter-sm grid grid-cols-2 gap-gutter-sm">
+            <button type="button" onclick="closeProfile()" class="rounded-lg border border-light-outline-variant py-3 font-label text-label-md">Batal</button>
+            <button type="submit" class="rounded-lg bg-light-primary py-3 font-label text-label-md text-light-on-primary">Simpan Profil</button>
+          </div>
+        </form>
+      </section>
+    </div>
   </div>
 
 <script>
@@ -323,6 +368,8 @@ if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
   let currentMode = 'pemasukan';
   let currentFilter = 'all';
   let saldoVisible = false;
+  let loginReturnTab = 'beranda';
+  let pendingAvatar = undefined;
 
   function formatRp(n) {
     return 'Rp ' + Math.round(Number(n || 0)).toLocaleString('id-ID');
@@ -351,7 +398,11 @@ if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
   }
 
   async function init() {
-    if (!token) return showLogin();
+    if (!token) {
+      records = [];
+      renderAll();
+      return showApp();
+    }
     try {
       const me = await api('/api/me');
       currentUser = me.user;
@@ -359,23 +410,50 @@ if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
       showApp();
     } catch (_) {
       token = '';
+      currentUser = null;
+      records = [];
       localStorage.removeItem(TOKEN_KEY);
-      showLogin();
+      renderAll();
+      showApp();
     }
   }
 
-  function showLogin() {
+  function openLogin(returnTab = 'beranda') {
+    loginReturnTab = returnTab;
     document.getElementById('login-overlay').hidden = false;
-    document.getElementById('app').hidden = true;
+    document.getElementById('login-error').textContent = '';
+    document.getElementById('login-username').focus();
+  }
+  function closeLogin() {
+    document.getElementById('login-overlay').hidden = true;
+    document.getElementById('login-error').textContent = '';
+  }
+  function updateAccountDisplay() {
+    const name = currentUser?.name || currentUser?.username || 'Jelajahi SUKAFIN';
+    const username = currentUser?.username || 'Tamu';
+    const avatar = currentUser?.avatar;
+    document.getElementById('greeting-name').textContent = name;
+    document.getElementById('greeting-role').textContent = currentUser?.role || 'Mode tamu';
+    document.getElementById('user-avatar').textContent = username.slice(0, 1).toUpperCase();
+    document.getElementById('user-avatar').hidden = Boolean(avatar);
+    document.getElementById('user-avatar-image').hidden = !avatar;
+    if (avatar) document.getElementById('user-avatar-image').src = avatar;
+    document.getElementById('guest-callout').hidden = Boolean(currentUser);
+    document.getElementById('nav-user').hidden = currentUser?.role !== 'superadmin';
+    document.getElementById('btn-login').hidden = Boolean(currentUser);
+    document.getElementById('btn-profile').hidden = !currentUser;
+    document.getElementById('btn-logout').hidden = !currentUser;
+    document.getElementById('btn-backup').hidden = currentUser?.role !== 'superadmin';
   }
   function showApp() {
     document.getElementById('login-overlay').hidden = true;
     document.getElementById('app').hidden = false;
-    document.getElementById('greeting-name').textContent = currentUser.username;
-    document.getElementById('greeting-role').textContent = currentUser.role;
-    document.getElementById('user-avatar').textContent = currentUser.username.slice(0, 1).toUpperCase();
-    document.getElementById('nav-user').hidden = currentUser.role !== 'superadmin';
+    updateAccountDisplay();
     switchTab('beranda');
+  }
+  function handleAccountClick() {
+    if (currentUser) openProfile();
+    else openLogin();
   }
 
   document.getElementById('login-form').addEventListener('submit', async e => {
@@ -395,7 +473,9 @@ if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
       localStorage.setItem(TOKEN_KEY, token);
       await loadData();
       showApp();
-      toast('Selamat datang, ' + currentUser.username);
+      if (loginReturnTab === 'inout') switchTab('inout');
+      loginReturnTab = 'beranda';
+      toast('Selamat datang, ' + (currentUser.name || currentUser.username));
     } catch (e2) {
       err.textContent = e2.message;
     }
@@ -407,8 +487,99 @@ if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
     currentUser = null;
     records = [];
     localStorage.removeItem(TOKEN_KEY);
-    showLogin();
+    renderAll();
+    showApp();
   }
+
+  function setProfileAvatarPreview(avatar) {
+    const image = document.getElementById('profile-avatar-preview');
+    const fallback = document.getElementById('profile-avatar-fallback');
+    if (avatar) {
+      image.src = avatar;
+      image.hidden = false;
+      fallback.hidden = true;
+    } else {
+      image.removeAttribute('src');
+      image.hidden = true;
+      fallback.textContent = (currentUser?.name || currentUser?.username || 'S').slice(0, 1).toUpperCase();
+      fallback.hidden = false;
+    }
+  }
+
+  function openProfile() {
+    if (!currentUser) return openLogin();
+    document.getElementById('profile-name').value = currentUser.name || currentUser.username;
+    document.getElementById('profile-username').value = currentUser.username;
+    document.getElementById('profile-password').value = '';
+    document.getElementById('profile-avatar-file').value = '';
+    document.getElementById('profile-error').textContent = '';
+    pendingAvatar = undefined;
+    setProfileAvatarPreview(currentUser.avatar);
+    document.getElementById('profile-overlay').hidden = false;
+    document.getElementById('profile-name').focus();
+  }
+
+  function closeProfile() {
+    document.getElementById('profile-overlay').hidden = true;
+    document.getElementById('profile-error').textContent = '';
+    pendingAvatar = undefined;
+  }
+
+  function removeProfileAvatar() {
+    pendingAvatar = null;
+    document.getElementById('profile-avatar-file').value = '';
+    setProfileAvatarPreview(null);
+  }
+
+  document.getElementById('profile-avatar-file').addEventListener('change', event => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    const error = document.getElementById('profile-error');
+    if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type) || file.size > 256 * 1024) {
+      error.textContent = 'Pilih foto PNG, JPG, atau WebP maksimal 256 KB.';
+      event.target.value = '';
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      pendingAvatar = String(reader.result);
+      setProfileAvatarPreview(pendingAvatar);
+      error.textContent = '';
+    };
+    reader.onerror = () => {
+      error.textContent = 'Foto tidak dapat dibaca. Coba pilih file lain.';
+    };
+    reader.readAsDataURL(file);
+  });
+
+  document.getElementById('profile-form').addEventListener('submit', async event => {
+    event.preventDefault();
+    const error = document.getElementById('profile-error');
+    error.textContent = '';
+    const body = {
+      name: document.getElementById('profile-name').value.trim(),
+      username: document.getElementById('profile-username').value.trim(),
+    };
+    const password = document.getElementById('profile-password').value;
+    if (password) body.password = password;
+    if (pendingAvatar !== undefined) body.avatar = pendingAvatar;
+
+    try {
+      const result = await api('/api/profile', {
+        method: 'PATCH',
+        body: JSON.stringify(body),
+      });
+      currentUser = result.user;
+      closeProfile();
+      updateAccountDisplay();
+      if (currentUser.role === 'superadmin') {
+        try { await loadUsers(); } catch (loadError) { toast(loadError.message); }
+      }
+      toast('Profil berhasil diperbarui');
+    } catch (saveError) {
+      error.textContent = saveError.message;
+    }
+  });
 
   async function loadData() {
     const res = await api('/api/records');
@@ -444,6 +615,11 @@ if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
   }
 
   function switchTab(name) {
+    if (name === 'inout' && !currentUser) {
+      openLogin('inout');
+      return;
+    }
+    if (name === 'user' && currentUser?.role !== 'superadmin') return;
     document.querySelectorAll('.tab-panel').forEach(el => el.classList.add('hidden'));
     const panel = document.getElementById('tab-' + name);
     panel.classList.remove('hidden');
@@ -495,7 +671,8 @@ if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
     document.getElementById('history-count').textContent = list.length + ' transaksi';
     const el = document.getElementById('history-list');
     if (!list.length) {
-      el.innerHTML = `<li class="rounded-lg border border-dashed border-light-outline-variant p-gutter-lg text-center font-body text-body-md text-light-on-surface-variant">Belum ada transaksi.</li>`;
+      const message = currentUser ? 'Belum ada transaksi.' : 'Masuk untuk melihat riwayat transaksi pribadi.';
+      el.innerHTML = `<li class="rounded-lg border border-dashed border-light-outline-variant p-gutter-lg text-center font-body text-body-md text-light-on-surface-variant">${message}</li>`;
       return;
     }
     el.innerHTML = list.map(r => {
@@ -574,6 +751,7 @@ if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
 
   document.getElementById('tx-form').addEventListener('submit', async e => {
     e.preventDefault();
+    if (!currentUser) return openLogin('inout');
     const nama = document.getElementById('tx-nama').value.trim();
     const nominal = Number(String(document.getElementById('tx-nominal').value).replace(/\D/g, ''));
     if (!nama || nominal <= 0) return toast('Isi nama dan nominal dengan benar');
@@ -605,14 +783,18 @@ if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
 
   async function loadUsers() {
     const res = await api('/api/users');
-    document.getElementById('users-list').innerHTML = res.data.map(u => `
-      <div class="flex items-center justify-between rounded-lg border border-light-outline-variant/30 bg-white p-gutter-12">
-        <div>
-          <p class="font-title text-title-md">${escapeHtml(u.username)} ${u.role === 'superadmin' ? '★' : ''}</p>
-          <p class="font-body text-body-sm text-light-on-surface-variant">${u.role} • ${u.recordCount} transaksi</p>
-        </div>
-        <button type="button" onclick="deleteUser(${u.id})" ${u.id === currentUser.id ? 'disabled' : ''} class="rounded-lg border border-light-error/30 px-3 py-1.5 font-label text-label-sm text-light-error disabled:opacity-40">${u.id === currentUser.id ? 'Akun ini' : 'Hapus'}</button>
-      </div>`).join('');
+    document.getElementById('users-list').innerHTML = res.data.map(u => {
+      const isCurrent = Number(u.id) === Number(currentUser.id);
+      const canDelete = u.role === 'user' && !isCurrent;
+      return `
+        <div class="flex items-center justify-between rounded-lg border border-light-outline-variant/30 bg-white p-gutter-12">
+          <div class="min-w-0">
+            <p class="truncate font-title text-title-md">${escapeHtml(u.name || u.username)} ${u.role === 'superadmin' ? '★' : ''}</p>
+            <p class="truncate font-body text-body-sm text-light-on-surface-variant">@${escapeHtml(u.username)} • ${u.role} • ${u.recordCount} transaksi</p>
+          </div>
+          <button type="button" onclick="deleteUser(${Number(u.id)})" ${canDelete ? '' : 'disabled'} class="ml-gutter-sm shrink-0 rounded-lg border border-light-error/30 px-3 py-1.5 font-label text-label-sm text-light-error disabled:opacity-40">${canDelete ? 'Hapus' : isCurrent ? 'Akun ini' : 'Admin'}</button>
+        </div>`;
+    }).join('');
   }
 
   document.getElementById('user-form').addEventListener('submit', async e => {
@@ -633,6 +815,7 @@ if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
   });
 
   async function deleteUser(id) {
+    if (!window.confirm('Hapus user ini beserta semua transaksi dan sesinya?')) return;
     try {
       await api('/api/users/' + id, { method: 'DELETE' });
       await loadUsers();
@@ -646,7 +829,7 @@ if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
       const m = await api('/api/meta');
       const dbMeta = document.getElementById('db-meta');
       if (dbMeta) dbMeta.textContent = `${m.database || 'SQLite'} • schema v${m.schemaVersion} • ${m.users} akun • ${m.records} transaksi`;
-      document.getElementById('btn-backup').hidden = m.backupAvailable === false;
+      document.getElementById('btn-backup').hidden = m.backupAvailable === false || currentUser?.role !== 'superadmin';
     } catch (_) {}
   }
 
