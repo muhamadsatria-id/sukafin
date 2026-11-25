@@ -81,10 +81,11 @@ if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
 <body class="bg-light-surface-container-lowest text-light-on-surface font-body antialiased">
 
   <!-- LOGIN -->
-  <div id="login-overlay" hidden class="fixed inset-0 z-50 flex items-center justify-center bg-light-primary/90 p-gutter-lg backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="login-title">
-    <form id="login-form" class="w-full max-w-sm rounded-xl bg-light-surface-container-lowest p-gutter-xl shadow-[0_16px_48px_-8px_rgba(0,40,32,0.35)]">
+  <div id="login-overlay" hidden class="fixed inset-0 z-50 flex items-center justify-center bg-[url('bg-login.webp')] bg-cover bg-center bg-no-repeat p-gutter-lg" role="dialog" aria-modal="true" aria-labelledby="login-title">
+    <div class="absolute inset-0 bg-light-primary/80 backdrop-blur-[2px]" aria-hidden="true"></div>
+    <form id="login-form" class="relative z-10 w-full max-w-sm rounded-xl bg-light-surface-container-lowest p-gutter-xl shadow-[0_16px_48px_-8px_rgba(0,40,32,0.35)]">
       <div class="mb-gutter-md flex items-center gap-gutter-sm">
-        <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-light-primary text-light-on-primary font-headline font-bold">S</div>
+        <img src="logo.png" alt="Sukafin" class="h-10 w-10 shrink-0 object-contain">
         <div>
           <p id="login-title" class="font-headline text-headline-md leading-tight">SUKAFIN</p>
           <p class="font-label text-label-sm text-light-on-surface-variant">by muhamadsatria</p>
@@ -775,7 +776,7 @@ if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
 
   async function deleteRecord(id) {
     try {
-      await api('/api/records/' + id, { method: 'DELETE' });
+      await api('/api/delete-record?id=' + encodeURIComponent(id), { method: 'DELETE' });
       await loadData();
       toast('Transaksi dihapus');
     } catch (err) { toast(err.message); }
@@ -817,7 +818,7 @@ if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
   async function deleteUser(id) {
     if (!window.confirm('Hapus user ini beserta semua transaksi dan sesinya?')) return;
     try {
-      await api('/api/users/' + id, { method: 'DELETE' });
+      await api('/api/delete-user?id=' + encodeURIComponent(id), { method: 'DELETE' });
       await loadUsers();
       await loadMeta();
       toast('User dihapus beserta datanya');

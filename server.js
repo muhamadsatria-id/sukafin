@@ -163,7 +163,9 @@ function isValidAvatar(value) {
 // ---------- API ----------
 async function handleApi(req, res, url) {
     const method = req.method;
-    const route = url.pathname;
+    let route = url.pathname;
+    if (route === '/api/delete-record') route = `/api/records/${url.searchParams.get('id') || ''}`;
+    if (route === '/api/delete-user') route = `/api/users/${url.searchParams.get('id') || ''}`;
 
     if (method === 'POST' && route === '/api/login') {
         const body = await readBody(req);
@@ -391,6 +393,7 @@ const MIME = {
     '.json': 'application/json; charset=utf-8',
     '.svg': 'image/svg+xml',
     '.png': 'image/png',
+    '.webp': 'image/webp',
     '.ico': 'image/x-icon',
 };
 

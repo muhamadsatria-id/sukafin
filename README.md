@@ -46,14 +46,15 @@ Lalu buka `http://localhost:4173`. Database SQLite lokal otomatis dimigrasikan d
 | PATCH  | `/api/profile`            | auth        | Ubah nama, username, foto, atau password sendiri |
 | GET    | `/api/records`           | auth        | Transaksi milik akun aktif      |
 | POST   | `/api/records`           | auth        | Tambah transaksi                |
-| DELETE | `/api/records/:id`       | auth        | Hapus transaksi sendiri         |
+| DELETE | `/api/delete-record?id=:id` | auth        | Hapus transaksi sendiri       |
 | GET    | `/api/users`             | superadmin  | Daftar user + jumlah transaksi  |
 | POST   | `/api/users`             | superadmin  | Tambah user                     |
-| DELETE | `/api/users/:id`         | superadmin  | Hapus user beserta datanya      |
+| DELETE | `/api/delete-user?id=:id` | superadmin  | Hapus user beserta datanya    |
 | GET    | `/api/meta`              | auth        | Info schema, akun, transaksi    |
 | GET    | `/api/backup`            | superadmin  | Unduh SQLite lokal; backup Neon melalui provider |
 
 Semua error memakai bentuk `{ "error": { "code", "message" } }`.
+Endpoint penghapusan memakai rute satu tingkat agar Vercel dapat memetakan file Function secara konsisten.
 
 ## Seed + migrasi manual
 
