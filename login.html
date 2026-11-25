@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sukafin - login</title>
+    <link rel="icon" href="favicon.ico" sizes="any">
       <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+      <script src="login-ui.js" defer></script>
   <script id="tailwind-config">/** @type {import('tailwindcss').Config} */
 globalThis.tailwind = globalThis.tailwind || {};
 globalThis.tailwind.config = {
@@ -96,11 +98,14 @@ if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
       <p class="mb-gutter-lg font-body text-body-md text-light-on-surface-variant">Masuk untuk mengelola alokasi dana dan kekayaanmu.</p>
       <label class="mb-gutter-xs block font-label text-label-md" for="login-username">Username</label>
       <input id="login-username" class="mb-gutter-md w-full rounded-lg border border-light-outline-variant bg-light-surface-container-lowest px-gutter-12 py-3 font-body text-body-md outline-none focus:border-light-primary" autocomplete="username" required>
-      <label class="mb-gutter-xs block font-label text-label-md" for="login-password">Password</label>
+      <div class="mb-gutter-xs flex items-center justify-between gap-gutter-sm">
+        <label class="block font-label text-label-md" for="login-password">Password</label>
+        <button type="button" data-wa-request="password" class="font-label text-label-sm text-light-primary underline underline-offset-2">Lupa password?</button>
+      </div>
       <input id="login-password" type="password" class="mb-gutter-md w-full rounded-lg border border-light-outline-variant bg-light-surface-container-lowest px-gutter-12 py-3 font-body text-body-md outline-none focus:border-light-primary" autocomplete="current-password" required>
       <p id="login-error" class="mb-gutter-sm min-h-4 font-body text-body-sm text-light-error" role="alert"></p>
       <button type="submit" class="w-full rounded-lg bg-light-primary py-3 font-label text-label-lg text-light-on-primary">Masuk</button>
-      <!-- <p class="mt-gutter-md text-center font-body text-body-sm text-light-on-surface-variant">Superadmin: <strong>superadmin</strong> / <strong>superadmin123</strong></p> -->
+      <p class="mt-gutter-md text-center font-body text-body-sm text-light-on-surface-variant">Hubungi administrator untuk mendapatkan akses.<button type="button" data-wa-request="access" class="font-bold text-light-primary underline underline-offset-2"> Klik di sini</button></p>
     </form>
   </div>
 </body>
