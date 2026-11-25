@@ -97,7 +97,7 @@ if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
       <input id="login-password" type="password" class="mb-gutter-md w-full rounded-lg border border-light-outline-variant bg-light-surface-container-lowest px-gutter-12 py-3 font-body text-body-md outline-none focus:border-light-primary" autocomplete="current-password" required>
       <p id="login-error" class="mb-gutter-sm min-h-4 font-body text-body-sm text-light-error" role="alert"></p>
       <button type="submit" class="w-full rounded-lg bg-light-primary py-3 font-label text-label-lg text-light-on-primary">Masuk</button>
-      <p class="mt-gutter-md text-center font-body text-body-sm text-light-on-surface-variant">Superadmin: <strong>superadmin</strong> / <strong>superadmin123</strong></p>
+      <p class="mt-gutter-md text-center font-body text-body-sm text-light-on-surface-variant">Login admin disiapkan melalui konfigurasi hosting.</p>
     </form>
   </div>
 
@@ -644,7 +644,9 @@ if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
   async function loadMeta() {
     try {
       const m = await api('/api/meta');
-      document.getElementById('db-meta').textContent = `SQLite • schema v${m.schemaVersion} • ${m.users} akun • ${m.records} transaksi`;
+      const dbMeta = document.getElementById('db-meta');
+      if (dbMeta) dbMeta.textContent = `${m.database || 'SQLite'} • schema v${m.schemaVersion} • ${m.users} akun • ${m.records} transaksi`;
+      document.getElementById('btn-backup').hidden = m.backupAvailable === false;
     } catch (_) {}
   }
 

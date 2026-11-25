@@ -2,9 +2,16 @@
   "name": "sukafin",
   "version": "1.0.0",
   "private": true,
-  "description": "Aplikasi alokasi dana & 7 tangga kekayaan (mobile-first) dengan backend SQLite bawaan Node.js",
+  "description": "Aplikasi alokasi dana dengan backend Vercel/Neon dan SQLite untuk development lokal",
   "scripts": {
     "start": "node server.js",
-    "db:init": "python scripts/init_db.py"
+    "db:init": "python scripts/init_db.py",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.2.1"
   }
 }

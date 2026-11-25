@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sukafin - login</title>
+      <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">/** @type {import('tailwindcss').Config} */
+globalThis.tailwind = globalThis.tailwind || {};
+globalThis.tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        'hero-teal': '#0D7A67', 'hero-amber': '#DEA02B',
+        'pos-pokok-bg': '#E7F3EE', 'pos-pokok-fg': '#005143',
+        'pos-invest-bg': '#FFEEDA', 'pos-invest-fg': '#7F5700',
+        'pos-darurat-bg': '#FFEDE9', 'pos-darurat-fg': '#85402E',
+        'pos-bebas-bg': '#EEF2EE', 'pos-bebas-fg': '#28332F',
+        'byond-teal': '#0D7A6E', 'byond-gold': '#D4A738',
+        'byond-amber-text': '#9A6700', 'byond-qris': '#E6A117',
+        'byond-nav-teal': '#00877A', 'byond-nav-inactive': '#5B5F5D',
+        'light-primary': '#005F50', 'light-on-primary': '#FFFFFF',
+        'light-primary-container': '#0D7A67', 'light-on-primary-container': '#AAFFE8',
+        'light-secondary': '#7F5700', 'light-on-secondary': '#FFFFFF',
+        'light-secondary-container': '#FDBA45', 'light-on-secondary-container': '#6F4B00',
+        'light-tertiary': '#85402E', 'light-on-tertiary': '#FFFFFF',
+        'light-tertiary-container': '#A35744', 'light-on-tertiary-container': '#FFEAE6',
+        'light-error': '#BA1A1A', 'light-on-error': '#FFFFFF',
+        'light-error-container': '#FFDAD6', 'light-on-error-container': '#93000A',
+        'light-background': '#F6FAF7', 'light-on-background': '#181D1B',
+        'light-surface': '#F6FAF7', 'light-surface-dim': '#D7DBD8',
+        'light-surface-bright': '#F6FAF7', 'light-surface-container-lowest': '#FFFFFF',
+        'light-surface-container-low': '#F1F5F1', 'light-surface-container': '#EBEFEC',
+        'light-surface-container-high': '#E5E9E6', 'light-surface-container-highest': '#DFE3E0',
+        'light-on-surface': '#181D1B', 'light-surface-variant': '#D9E5E0',
+        'light-on-surface-variant': '#3E4945', 'light-outline': '#6E7A75',
+        'light-outline-variant': '#BDC9C4', 'light-inverse-surface': '#2D3130',
+        'light-inverse-on-surface': '#EEF2EE', 'light-inverse-primary': '#7CD7C0',
+        'dark-primary': '#7CD7C0', 'dark-on-primary': '#00382E',
+        'dark-primary-container': '#0D7A67', 'dark-on-primary-container': '#AAFFE8',
+        'dark-secondary': '#FDBA45', 'dark-on-secondary': '#432C00',
+        'dark-surface': '#101413', 'dark-on-surface': '#DFE3E0',
+      },
+      borderRadius: { 'sm':'6px','DEFAULT':'10px','md':'12px','lg':'16px','xl':'20px','full':'9999px' },
+      spacing: {
+        'gutter-xs':'4px','gutter-sm':'8px','gutter-12':'12px','gutter-md':'16px',
+        'gutter-lg':'20px','gutter-xl':'24px','section':'32px','page-margin':'16px',
+      },
+      fontFamily: {
+        'display':['"Red Hat Text"','sans-serif'],'headline':['"Red Hat Text"','sans-serif'],
+        'title':['"Red Hat Text"','sans-serif'],'body':['"Instrument Sans"','sans-serif'],
+        'label':['"Instrument Sans"','sans-serif'],'mono':['"Source Code Pro"','monospace'],
+      },
+      fontSize: {
+        'display-lg':['36px',{lineHeight:'44px',letterSpacing:'-0.5px',fontWeight:'700'}],
+        'headline-lg':['22px',{lineHeight:'28px',letterSpacing:'-0.25px',fontWeight:'700'}],
+        'headline-md':['18px',{lineHeight:'24px',letterSpacing:'-0.15px',fontWeight:'700'}],
+        'title-md':['15px',{lineHeight:'20px',letterSpacing:'0px',fontWeight:'600'}],
+        'body-md':['14px',{lineHeight:'20px',letterSpacing:'0px',fontWeight:'400'}],
+        'body-sm':['12px',{lineHeight:'16px',letterSpacing:'0px',fontWeight:'400'}],
+        'label-lg':['14px',{lineHeight:'20px',letterSpacing:'0.1px',fontWeight:'600'}],
+        'label-md':['12px',{lineHeight:'16px',letterSpacing:'0.2px',fontWeight:'600'}],
+        'label-sm':['11px',{lineHeight:'14px',letterSpacing:'0.2px',fontWeight:'600'}],
+      },
+    },
+  },
+};
+if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
+</script>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Red+Hat+Text:wght@500;600;700&family=Source+Code+Pro:wght@500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" rel="stylesheet">
+  <style>
+    .material-symbols-outlined { display:inline-block;width:1em;height:1em;line-height:1!important;box-sizing:content-box;overflow:hidden;white-space:nowrap;direction:ltr;vertical-align:middle; }
+    .no-scrollbar::-webkit-scrollbar { display:none; }
+    .no-scrollbar { -ms-overflow-style:none; scrollbar-width:none; }
+    [hidden] { display:none !important; }
+  </style>
+</head>
+<body class="bg-light-surface-container-lowest text-light-on-surface font-body antialiased">
+    <!-- LOGIN -->
+  <div id="login-overlay" class="fixed inset-0 z-50 flex items-center justify-center bg-[url('bg-login.jpg')] p-gutter-lg">
+    <form id="login-form" class="w-full max-w-sm rounded-xl bg-light-surface-container-lowest p-gutter-xl shadow-[0_16px_48px_-8px_rgba(0,40,32,0.35)]">
+      <div class="mb-gutter-md flex items-center gap-gutter-sm">
+        <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-light-primary text-light-on-primary font-headline font-bold">S</div>
+        <div>
+          <p class="font-headline text-headline-md leading-tight">SUKAFIN</p>
+          <p class="font-label text-label-sm text-light-on-surface-variant">by muhamadsatria</p>
+        </div>
+      </div>
+      <p class="mb-gutter-lg font-body text-body-md text-light-on-surface-variant">Masuk untuk mengelola alokasi dana dan kekayaanmu.</p>
+      <label class="mb-gutter-xs block font-label text-label-md" for="login-username">Username</label>
+      <input id="login-username" class="mb-gutter-md w-full rounded-lg border border-light-outline-variant bg-light-surface-container-lowest px-gutter-12 py-3 font-body text-body-md outline-none focus:border-light-primary" autocomplete="username" required>
+      <label class="mb-gutter-xs block font-label text-label-md" for="login-password">Password</label>
+      <input id="login-password" type="password" class="mb-gutter-md w-full rounded-lg border border-light-outline-variant bg-light-surface-container-lowest px-gutter-12 py-3 font-body text-body-md outline-none focus:border-light-primary" autocomplete="current-password" required>
+      <p id="login-error" class="mb-gutter-sm min-h-4 font-body text-body-sm text-light-error" role="alert"></p>
+      <button type="submit" class="w-full rounded-lg bg-light-primary py-3 font-label text-label-lg text-light-on-primary">Masuk</button>
+      <!-- <p class="mt-gutter-md text-center font-body text-body-sm text-light-on-surface-variant">Superadmin: <strong>superadmin</strong> / <strong>superadmin123</strong></p> -->
+    </form>
+  </div>
+</body>
+</html>

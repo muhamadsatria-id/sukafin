@@ -5,30 +5,41 @@ Aplikasi alokasi dana & 7 tangga kekayaan, mobile-first, memakai desain Tailwind
 ## Arsitektur
 
 - **Frontend**: `index.html` — Tailwind CDN, font Instrument Sans / Red Hat Text, Material Symbols, 5 tab bottom nav (Beranda, Dompet, In-Outflow, Level, Manage User).
-- **Backend**: `server.js` — Node.js `node:http` + `node:sqlite` (tanpa dependency pihak ketiga).
-- **Database**: `db/sukafin.sqlite` dengan migrasi di `db/migrations/` dan seeder di `db/seeds/`.
+- **Backend lokal**: `server.js` — Node.js `node:http` + SQLite.
+- **Backend Vercel**: `api/[...path].js` — Vercel Function dengan PostgreSQL Neon.
+- **Database lokal**: `db/sukafin.sqlite` dengan migrasi di `db/migrations/` dan seeder di `db/seeds/`.
 
-Migrasi + seeder dijalankan otomatis setiap kali server start.
+Vercel Functions tidak memiliki filesystem persisten, jadi database SQLite lokal hanya digunakan saat development. Schema Neon dan akun superadmin dibuat otomatis saat API pertama kali dipanggil.
 
-## Menjalankan
+## Deploy ke Vercel
+
+1. Import repository GitHub ini ke Vercel. Push berikutnya akan membuat deployment baru otomatis.
+2. Di project Vercel, buka **Storage / Marketplace**, buat database **Neon Postgres**, lalu hubungkan ke project. Integrasi akan menambahkan `DATABASE_URL` (atau `POSTGRES_URL`).
+3. Di **Settings → Environment Variables**, tambahkan:
+
+   - `SUPERADMIN_USERNAME`: username admin awal.
+   - `SUPERADMIN_PASSWORD`: password admin yang kuat dan unik.
+
+   Terapkan ke environment yang digunakan (Production dan Preview bila diperlukan), lalu redeploy agar variable tersedia.
+4. Buka URL deployment dan login memakai username/password yang diatur di langkah 3.
+
+Jangan gunakan kredensial demo lokal untuk production. Jika akun superadmin dengan username tersebut sudah ada, seeder tidak akan mengubah password atau role yang tersimpan.
+
+## Menjalankan lokal
+
+Gunakan Node.js 22.13+:
 
 ```bash
 npm start
 ```
 
-Lalu buka `http://localhost:4173`.
+Lalu buka `http://localhost:4173`. Database SQLite lokal otomatis dimigrasikan dan diisi akun demo `superadmin` / `superadmin123`. Kredensial tersebut hanya untuk development.
 
-Login superadmin:
-
-```
-username: superadmin
-password: superadmin123
-```
-
-## API (ringkas)
+## API
 
 | Method | Endpoint                 | Akses       | Fungsi                          |
 |--------|--------------------------|-------------|---------------------------------|
+| GET    | `/api/health`            | publik      | Cek koneksi database            |
 | POST   | `/api/login`             | publik      | Login, mengembalikan bearer token |
 | POST   | `/api/logout`            | auth        | Hapus sesi                      |
 | GET    | `/api/me`                | auth        | Data akun aktif                 |
@@ -39,7 +50,7 @@ password: superadmin123
 | POST   | `/api/users`             | superadmin  | Tambah user                     |
 | DELETE | `/api/users/:id`         | superadmin  | Hapus user beserta datanya      |
 | GET    | `/api/meta`              | auth        | Info schema, akun, transaksi    |
-| GET    | `/api/backup`            | superadmin  | Unduh file `.sqlite`            |
+| GET    | `/api/backup`            | superadmin  | Unduh SQLite lokal; backup Neon melalui provider |
 
 Semua error memakai bentuk `{ "error": { "code", "message" } }`.
 
@@ -51,4 +62,4 @@ npm run db:init
 
 ## Catatan
 
-Sesi login disimpan di memory server (token bearer) dan di localStorage browser. Token hilang saat server restart. Data transaksi tetap aman di SQLite karena dibatasi oleh `user_id` di server, bukan hanya di frontend.
+Di Vercel, sesi disimpan di Neon dan berlaku 7 hari, sehingga tidak hilang saat function berhenti. Data transaksi dibatasi oleh `user_id` di server, bukan hanya di frontend. Backup production dilakukan melalui Neon.

@@ -295,11 +295,18 @@ async function handleApi(req, res, url) {
     }
 
     if (method === 'GET' && route === '/api/meta') {
-        requireAuth(req, res);
+        const user = requireAuth(req, res);
+        if (!user) return;
         const version = db.prepare("SELECT value FROM meta WHERE key='schema_version'").get()?.value || '0';
         const users = db.prepare('SELECT COUNT(*) c FROM users').get().c;
         const records = db.prepare('SELECT COUNT(*) c FROM records').get().c;
-        return sendJson(res, 200, { schemaVersion: version, users, records });
+        return sendJson(res, 200, {
+            schemaVersion: version,
+            users,
+            records,
+            database: 'SQLite',
+            backupAvailable: true,
+        });
     }
 
     if (method === 'GET' && route === '/api/backup') {
