@@ -4,6 +4,19 @@ const assert = require('node:assert/strict');
 const test = require('node:test');
 const handler = require('../api/[...path].js');
 
+const DATABASE_ENV_NAMES = [
+    'DATABASE_URL',
+    'POSTGRES_URL',
+    'NEON_DATABASE_URL',
+    'NEON_POSTGRES_URL',
+    'DATABASE_URL_UNPOOLED',
+    'POSTGRES_URL_NON_POOLING',
+    'POSTGRES_PRISMA_URL',
+    'POSTGRES_PRISMA_URL_NON_POOLING',
+    'SUPERADMIN_USERNAME',
+    'SUPERADMIN_PASSWORD',
+];
+
 async function invokeHealthCheck() {
     const response = {
         headers: {},
@@ -18,51 +31,41 @@ async function invokeHealthCheck() {
     return response;
 }
 
-test('reports missing Neon connection configuration', async t => {
-    const previousUrl = process.env.DATABASE_URL;
-    const previousPostgresUrl = process.env.POSTGRES_URL;
-    const previousUsername = process.env.SUPERADMIN_USERNAME;
-    const previousPassword = process.env.SUPERADMIN_PASSWORD;
-    delete process.env.DATABASE_URL;
-    delete process.env.POSTGRES_URL;
-    delete process.env.SUPERADMIN_USERNAME;
-    delete process.env.SUPERADMIN_PASSWORD;
+function setEnvironment(t, values) {
+    const previous = Object.fromEntries(DATABASE_ENV_NAMES.map(name => [name, process.env[name]]));
+    for (const name of DATABASE_ENV_NAMES) delete process.env[name];
+    Object.assign(process.env, values);
     t.after(() => {
-        if (previousUrl === undefined) delete process.env.DATABASE_URL;
-        else process.env.DATABASE_URL = previousUrl;
-        if (previousPostgresUrl === undefined) delete process.env.POSTGRES_URL;
-        else process.env.POSTGRES_URL = previousPostgresUrl;
-        if (previousUsername === undefined) delete process.env.SUPERADMIN_USERNAME;
-        else process.env.SUPERADMIN_USERNAME = previousUsername;
-        if (previousPassword === undefined) delete process.env.SUPERADMIN_PASSWORD;
-        else process.env.SUPERADMIN_PASSWORD = previousPassword;
+        for (const [name, value] of Object.entries(previous)) {
+            if (value === undefined) delete process.env[name];
+            else process.env[name] = value;
+        }
     });
+}
 
+test('reports missing Neon connection configuration', async t => {
+    setEnvironment(t, {});
     const response = await invokeHealthCheck();
     assert.equal(response.statusCode, 503);
     assert.equal(JSON.parse(response.payload).error.code, 'DATABASE_NOT_CONFIGURED');
 });
 
 test('reports missing initial admin credentials', async t => {
-    const previousUrl = process.env.DATABASE_URL;
-    const previousPostgresUrl = process.env.POSTGRES_URL;
-    const previousUsername = process.env.SUPERADMIN_USERNAME;
-    const previousPassword = process.env.SUPERADMIN_PASSWORD;
-    process.env.DATABASE_URL = 'postgres://placeholder';
-    delete process.env.POSTGRES_URL;
-    delete process.env.SUPERADMIN_USERNAME;
-    delete process.env.SUPERADMIN_PASSWORD;
-    t.after(() => {
-        if (previousUrl === undefined) delete process.env.DATABASE_URL;
-        else process.env.DATABASE_URL = previousUrl;
-        if (previousPostgresUrl === undefined) delete process.env.POSTGRES_URL;
-        else process.env.POSTGRES_URL = previousPostgresUrl;
-        if (previousUsername === undefined) delete process.env.SUPERADMIN_USERNAME;
-        else process.env.SUPERADMIN_USERNAME = previousUsername;
-        if (previousPassword === undefined) delete process.env.SUPERADMIN_PASSWORD;
-        else process.env.SUPERADMIN_PASSWORD = previousPassword;
-    });
+    setEnvironment(t, { DATABASE_URL: 'postgres://placeholder' });
+    const response = await invokeHealthCheck();
+    assert.equal(response.statusCode, 503);
+    assert.equal(JSON.parse(response.payload).error.code, 'ADMIN_NOT_CONFIGURED');
+});
 
+test('accepts a Neon-prefixed connection string', async t => {
+    setEnvironment(t, { NEON_DATABASE_URL: 'postgres://placeholder' });
+    const response = await invokeHealthCheck();
+    assert.equal(response.statusCode, 503);
+    assert.equal(JSON.parse(response.payload).error.code, 'ADMIN_NOT_CONFIGURED');
+});
+
+test('accepts Vercel Neon POSTGRES_PRISMA_URL', async t => {
+    setEnvironment(t, { POSTGRES_PRISMA_URL: 'postgres://placeholder' });
     const response = await invokeHealthCheck();
     assert.equal(response.statusCode, 503);
     assert.equal(JSON.parse(response.payload).error.code, 'ADMIN_NOT_CONFIGURED');

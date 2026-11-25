@@ -19,7 +19,24 @@ function fail(res, status, code, message) {
 }
 
 function getDatabaseUrl() {
-    return process.env.DATABASE_URL || process.env.POSTGRES_URL;
+    const knownNames = [
+        'DATABASE_URL',
+        'POSTGRES_URL',
+        'NEON_DATABASE_URL',
+        'NEON_POSTGRES_URL',
+        'DATABASE_URL_UNPOOLED',
+        'POSTGRES_URL_NON_POOLING',
+        'POSTGRES_PRISMA_URL',
+        'POSTGRES_PRISMA_URL_NON_POOLING',
+    ];
+    for (const name of knownNames) {
+        if (process.env[name]) return process.env[name];
+    }
+
+    const prefixedNames = Object.keys(process.env).filter(name =>
+        /_(DATABASE_URL|POSTGRES_URL)$/.test(name) && process.env[name]
+    );
+    return prefixedNames.length === 1 ? process.env[prefixedNames[0]] : null;
 }
 
 async function getSqlClient() {
@@ -354,7 +371,7 @@ module.exports = async function handler(req, res) {
     try {
         const databaseUrl = getDatabaseUrl();
         if (!databaseUrl) {
-            return fail(res, 503, 'DATABASE_NOT_CONFIGURED', 'Hubungkan Neon ke project Vercel agar database tersedia.');
+            return fail(res, 503, 'DATABASE_NOT_CONFIGURED', 'Connection string Neon tidak ditemukan. Pastikan DATABASE_URL, POSTGRES_URL, atau POSTGRES_PRISMA_URL tersedia untuk environment deployment ini, lalu redeploy.');
         }
         const adminUsername = process.env.SUPERADMIN_USERNAME;
         const adminPassword = process.env.SUPERADMIN_PASSWORD;

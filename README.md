@@ -14,7 +14,7 @@ Vercel Functions tidak memiliki filesystem persisten, jadi database SQLite lokal
 ## Deploy ke Vercel
 
 1. Import repository GitHub ini ke Vercel. Push berikutnya akan membuat deployment baru otomatis.
-2. Di project Vercel, buka **Storage / Marketplace**, buat database **Neon Postgres**, lalu hubungkan ke project. Integrasi akan menambahkan `DATABASE_URL` (atau `POSTGRES_URL`).
+2. Di project Vercel, buka **Storage / Marketplace**, buat database **Neon Postgres**, lalu hubungkan ke project. Integrasi umumnya menambahkan `DATABASE_URL`; API juga menerima `POSTGRES_URL` dan nama Neon umum lainnya.
 3. Di **Settings → Environment Variables**, tambahkan:
 
    - `SUPERADMIN_USERNAME`: username admin awal.
