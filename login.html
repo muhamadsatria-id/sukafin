@@ -81,6 +81,11 @@ if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
     <!-- LOGIN -->
   <div id="login-overlay" class="fixed inset-0 z-50 flex items-center justify-center bg-[url('bg-login.webp')] bg-cover bg-center bg-no-repeat p-gutter-lg">
     <form id="login-form" class="w-full max-w-sm rounded-xl bg-light-surface-container-lowest p-gutter-xl shadow-[0_16px_48px_-8px_rgba(0,40,32,0.35)]">
+      <div class="mb-gutter-md flex items-center gap-1.5" aria-hidden="true">
+        <span class="h-2 w-2 rounded-full bg-[#FF5F57]"></span>
+        <span class="h-2 w-2 rounded-full bg-[#FEBC2E]"></span>
+        <span class="h-2 w-2 rounded-full bg-[#28C840]"></span>
+      </div>
       <div class="mb-gutter-md flex items-center gap-gutter-sm">
         <img src="logo.png" alt="Sukafin" class="h-10 w-10 shrink-0 object-contain">
         <div>
